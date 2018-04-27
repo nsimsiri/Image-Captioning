@@ -7,13 +7,15 @@ import pickle
 from data_loader import get_loader
 from data_loader import get_loader_coco
 from build_vocab import Vocabulary
-from model import EncoderCNN, DecoderRNN
+from att_model import EncoderCNN, DecoderRNN
+# from model import EncoderCNN, DecoderRNN
 from torch.autograd import Variable
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
 import json;
 import sys;
 import time;
+#
 
 def to_var(x, volatile=False):
     if torch.cuda.is_available():
@@ -55,6 +57,7 @@ def main(args):
                          len(vocab), args.num_layers)
 
     if torch.cuda.is_available():
+        print '---- USING GPU ---- '
         encoder.cuda()
         decoder.cuda()
 
@@ -81,6 +84,7 @@ def main(args):
             images = to_var(images, volatile=True)
             captions = to_var(captions)
             targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
+            targets2 = captions.view((captions.shape[0]*captions.shape[1], ));
 
             # Forward, Backward and Optimize
             # print 'Forward, Backward and Optimize -- %s'%(i)
@@ -88,13 +92,17 @@ def main(args):
             encoder.zero_grad()
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
-            # print 'output', outputs
+            # print 'output', outputs.shape;
             # print 'target', targets;
-            loss = criterion(outputs, targets)
+            # print 'caption', captions;
+            # print 'caption-shape',captions.shape;
+            # print 'target-shape', targets.shape
+            # print 'target2-shape', targets2.shape
+            loss = criterion(outputs, targets2) #targets
             loss.backward()
             optimizer.step()
-
             # Print log info
+
             if i % args.log_step == 0:
                 print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
                       %(epoch, args.num_epochs, i, total_step,

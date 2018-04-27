@@ -3,6 +3,7 @@ import torch.nn as nn
 import torchvision.models as models
 from torch.nn.utils.rnn import pack_padded_sequence
 from torch.autograd import Variable
+from OldModel import *;
 
 class EncoderCNN(nn.Module):
     def __init__(self, embed_size):
@@ -33,11 +34,14 @@ class DecoderRNN(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
+        print 'embed_size: ',embed_size, 'hidden_size: ',hidden_size, 'vocab_size: ',vocab_size, 'num_layers: ',num_layers
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
-        self.init_weights()
-
+        self.lstm_cell = nn.LSTMCell(embed_size, hidden_size);
+        self.init_weights();
+        self.hidden_size = hidden_size;
+        self.embed_size = embed_size;
     def init_weights(self):
         """Initialize weights."""
         self.embed.weight.data.uniform_(-0.1, 0.1)
@@ -46,12 +50,21 @@ class DecoderRNN(nn.Module):
 
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
+        print 'captio.shape', captions.shape
+        N, L = captions.shape;
         embeddings = self.embed(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
-        packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
-        hiddens, _ = self.lstm(packed)
-        outputs = self.linear(hiddens[0])
-        return outputs
+        next_c = Variable(torch.zeros(N, self.hidden_size))
+        next_h = Variable(torch.zeros(N, self.hidden_size))
+        hiddens = torch.zeros((L, N, self.hidden_size));
+        h_list = []
+        for i in range(0,L):
+            next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));
+            h_list.append(next_h);
+        # packed = pack_padded_sequence(embeddings, lengths, batch_first=True);
+        hiddens = torch.cat(h_list);
+        outputs = self.linear(hiddens)
+        return outputs;
 
     def sample(self, features, states=None):
         """Samples captions for given image features (Greedy search)."""
