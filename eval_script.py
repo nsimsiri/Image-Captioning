@@ -80,32 +80,36 @@ for (dirpath, dirnames, filenames) in walk('./models'):
 
         print 'Evaluating model - nlayer:% s emb:%s hid:%s'%(num_layers, embed_size, hidden_size);
         for img_id in imgIds:
-            print 'evaluating img: ', img_id
-            img = coco.loadImgs(img_id)[0] # index 0 because only 1 img return ie. coco.loadImgs.. = [img_we_want]
-            args = Args(img['file_name'], hardpath=('./data/val_resized2014' if dataType==VAL else './data/resized2014'), \
-                        enc=xoder2fn['encoder'], dec=xoder2fn['decoder']);
-            args.num_layers = int(num_layers);
-            args.embed_size = int(embed_size);
-            args.hidden_size = int(hidden_size);
-            coco.dataset['type'] = None; # to fix bug with diff versio.
-            annIds = coco.getAnnIds(imgIds=[img['id']])
-            ann = coco.loadAnns(annIds)
-            gold = [x['caption'] for x in ann]
-            caption_obj = copy.copy(ann[0]);
-            caption_obj['file_name'] = str(args.image); #file name'
-            # print '\n------TRUE CAPTIONS------';
-            # for sen in gold:
-            #     print sen
-            args.encoder = cached_encoder;
-            args.decoder = cached_decoder;
-            args.vocab = cached_vocab;
-            caption, cached_encoder, cached_decoder, cached_vocab = main(args, show_img=False);
-            print 'caption', caption;
-            caption = caption.replace('<start>','').replace('<end>','')
-            caption_obj['caption'] = caption;
-            # img['caption'] = caption;
-            # gen_captions.append({'caption': caption, 'image_id': img_id});
-            GEN_CAPS.append(caption_obj);
+
+            print '--\nevaluating img: ', img_id
+            try :
+                img = coco.loadImgs(img_id)[0] # index 0 because only 1 img return ie. coco.loadImgs.. = [img_we_want]
+                args = Args(img['file_name'], hardpath=('./data/val_resized2014' if dataType==VAL else './data/resized2014'), \
+                            enc=xoder2fn['encoder'], dec=xoder2fn['decoder']);
+                args.num_layers = int(num_layers);
+                args.embed_size = int(embed_size);
+                args.hidden_size = int(hidden_size);
+                coco.dataset['type'] = None; # to fix bug with diff versio.
+                annIds = coco.getAnnIds(imgIds=[img['id']])
+                ann = coco.loadAnns(annIds)
+                gold = [x['caption'] for x in ann]
+                caption_obj = copy.copy(ann[0]);
+                caption_obj['file_name'] = str(args.image); #file name'
+                # print '\n------TRUE CAPTIONS------';
+                # for sen in gold:
+                #     print sen
+                args.encoder = cached_encoder;
+                args.decoder = cached_decoder;
+                args.vocab = cached_vocab;
+                caption, cached_encoder, cached_decoder, cached_vocab = main(args, show_img=False);
+                print 'caption', caption;
+                caption = caption.replace('<start>','').replace('<end>','')
+                caption_obj['caption'] = caption;
+                # img['caption'] = caption;
+                # gen_captions.append({'caption': caption, 'image_id': img_id});
+                GEN_CAPS.append(caption_obj);
+            except Exception as e:
+                print '\n-- erorr on img_id', img_id, ,'\n',e,'\n';
 
         EVAL_MAP[arg] = GEN_CAPS;
         break;
