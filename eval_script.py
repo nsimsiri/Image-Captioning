@@ -17,8 +17,8 @@ import json
 import copy;
 import pickle
 
-GENCAP_DIR = './gen_caps/LSTM_EXP1.pkl'
-XODER_PATH = './models/EXP1/'
+GENCAP_DIR = './gen_caps/LSTM_EXP2.pkl'
+XODER_PATH = './models/'
 dataDir='./coco'
 mypath = "./data/val_resized2014"
 # mypath = "./data/resized2014"
