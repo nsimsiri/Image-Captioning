@@ -23,9 +23,6 @@ def to_var(x, volatile=False):
     return Variable(x, volatile=volatile)
 
 def name_pretrained_sizes(nl, emb, hid, xoder, epoch, i): return '%d_%d_%d_%s-%d-%d.pkl' %(nl, emb, hid, xoder, epoch+1, i+1)
-def name_pretrained_lr(lr_mag, xoder, epoch, i):
-    s = str(lr_mag).replace('.','');
-    return 'learning_%s_%s-%d-%d.pkl' %(s,xoder, epoch+1, i+1)
 
 def main(args):
     # Create model directory
@@ -85,7 +82,11 @@ def main(args):
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
 
-            loss = criterion(outputs, targets) #targets
+            # print 'output', outputs.shape;
+            # print 'caption-shape',captions.shape;
+            # print 'target-shape', targets.shape
+            # print 'target2-shape', targets2.shape
+            loss = criterion(outputs, targets2) #targets
             loss.backward()
             optimizer.step()
             # Print log info
@@ -94,20 +95,29 @@ def main(args):
                 print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
                       %(epoch, args.num_epochs, i, total_step,
                         loss.data[0], np.exp(loss.data[0]), time.time()-t0))
-            # else:
-            #     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0)
+            else:
+                print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
+
+            # Save the models
+            # if (i+1) % args.save_step == 0:
+            #     torch.save(decoder.state_dict(),
+            #                os.path.join(args.model_path,
+            #                             name_pretrained_sizes(args.embed_size, args.hidden_size, "decoder")),
+            #                             # 'decoder-%d-%d.pkl' %(epoch+1, i+1)))
+            #     torch.save(encoder.state_dict(),
+            #                os.path.join(args.model_path,
+            #                             name_pretrained_sizes(args.embed_size, args.hidden_size, "encoder")),
+            #                             'encoder-%d-%d.pkl' %(epoch+1, i+1)))
     print 'saving final model';
     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
     torch.save(decoder.state_dict(),
                os.path.join(args.model_path,
-                            name_pretrained_lr(args.learning_rate, "decoder", epoch, i)))
                             # name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "decoder", epoch, i)))
-                            # 'decoder-%d-%d.pkl' %(epoch+1, i+1)))
+                            'decoder-%d-%d.pkl' %(epoch+1, i+1)))
     torch.save(encoder.state_dict(),
                os.path.join(args.model_path,
-                            name_pretrained_lr(args.learning_rate, "encoder", epoch, i)))
                             # name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "encoder", epoch, i)))
-                            # 'encoder-%d-%d.pkl' %(epoch+1, i+1)))
+                            'encoder-%d-%d.pkl' %(epoch+1, i+1)))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -122,23 +132,23 @@ if __name__ == '__main__':
     parser.add_argument('--caption_path', type=str,
                         default='./coco/annotations/sm_captions_train2014.json',
                         help='path for train annotation json file')
-    parser.add_argument('--log_step', type=int , default=50,
+    parser.add_argument('--log_step', type=int , default=500,
                         help='step size for prining log info')
     parser.add_argument('--save_step', type=int , default=500,
                         help='step size for saving trained models')
 
     # Model parameters
-    parser.add_argument('--embed_size', type=int , default=32 , #256
+    parser.add_argument('--embed_size', type=int , default=16 , #256
                         help='dimension of word embedding vectors')
-    parser.add_argument('--hidden_size', type=int , default=64 , #512
+    parser.add_argument('--hidden_size', type=int , default=16 , #512
                         help='dimension of lstm hidden states')
     parser.add_argument('--num_layers', type=int , default=1 ,
                         help='number of layers in lstm')
 
-    parser.add_argument('--num_epochs', type=int, default=5)
-    parser.add_argument('--batch_size', type=int, default=25) #128
+    parser.add_argument('--num_epochs', type=int, default=1)
+    parser.add_argument('--batch_size', type=int, default=5) #128
     parser.add_argument('--num_workers', type=int, default=2)
-    parser.add_argument('--learning_rate', type=float, default=0.005)
+    parser.add_argument('--learning_rate', type=float, default=0.01)
     args = parser.parse_args()
     print(args)
     main(args)

@@ -38,6 +38,7 @@ class DecoderRNN(nn.Module):
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
+        self.affine_lstm_init = nn.Linear(hidden_size, vocab_size)
         self.lstm_cell = nn.LSTMCell(embed_size, hidden_size);
         self.init_weights();
         self.hidden_size = hidden_size;
@@ -47,20 +48,23 @@ class DecoderRNN(nn.Module):
         self.embed.weight.data.uniform_(-0.1, 0.1)
         self.linear.weight.data.uniform_(-0.1, 0.1)
         self.linear.bias.data.fill_(0)
+        self.affine_lstm_init.weight.data.uniform_(-0.1, 0.1)
+        self.affine_lstm_init.bias.data.fill_(0)
 
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
         N, L = captions.shape;
         embeddings = self.embed(captions)
-        embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
+        # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
+
         next_c = Variable(torch.zeros(N, self.hidden_size))
-        next_h = Variable(torch.zeros(N, self.hidden_size))
+        # next_h = Variable(torch.zeros(N, self.hidden_size))
+        next_h = self.affine_lstm_init(features);
         hiddens = torch.zeros((L, N, self.hidden_size));
         h_list = []
-        for i in range(0,L):
+        for i in range(1,L):
             next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));
             h_list.append(next_h);
-        # packed = pack_padded_sequence(embeddings, lengths, batch_first=True);
         hiddens = torch.cat(h_list);
         outputs = self.linear(hiddens)
         return outputs;
@@ -76,12 +80,6 @@ class DecoderRNN(nn.Module):
             sampled_ids.append(predicted)
             inputs = self.embed(predicted)
             inputs = inputs.unsqueeze(1)                         # (batch_size, 1, embed_size)
-        # print 'sampling caption...', type(sampled_ids), 'len=',len(sampled_ids);
-        # print '\n------\n'
-        # print sampled_ids
-        # print '\n------\n'
-        # print sampled_ids[0]
-        # print '\n------\n'
         sampled_ids = torch.cat(sampled_ids, 0)                  # (batch_size, 20)
         return sampled_ids.squeeze()
 
