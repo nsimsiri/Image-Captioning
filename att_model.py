@@ -33,12 +33,13 @@ class EncoderCNN(nn.Module):
 class DecoderRNN(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers):
         """Set the hyper-parameters and build the layers."""
+
         super(DecoderRNN, self).__init__()
-        print 'embed_size: ',embed_size, 'hidden_size: ',hidden_size, 'vocab_size: ',vocab_size, 'num_layers: ',num_layers
+        print '[ATT_DECODER] embed_size: ',embed_size, 'hidden_size: ',hidden_size, 'vocab_size: ',vocab_size, 'num_layers: ',num_layers
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
-        self.affine_lstm_init = nn.Linear(hidden_size, vocab_size)
+        self.affine_lstm_init = nn.Linear(embed_size, hidden_size)
         self.lstm_cell = nn.LSTMCell(embed_size, hidden_size);
         self.init_weights();
         self.hidden_size = hidden_size;
@@ -62,7 +63,7 @@ class DecoderRNN(nn.Module):
         next_h = self.affine_lstm_init(features);
         hiddens = torch.zeros((L, N, self.hidden_size));
         h_list = []
-        for i in range(1,L):
+        for i in range(0,L):
             next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));
             h_list.append(next_h);
         hiddens = torch.cat(h_list);
