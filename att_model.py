@@ -60,7 +60,7 @@ class DecoderRNN(nn.Module):
         N, L = captions.shape;
         embeddings = self.embed(captions)
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
-        next_c = Variable(torch.zeros(N, self.hidden_size))
+        next_c = Variable(torch.zeros(N, self.hidden_size)) #need cuda
         # next_h = Variable(torch.zeros(N, self.hidden_size))
         next_h = self.affine_lstm_init(features);
         print 'embeddings', embeddings;
@@ -69,9 +69,8 @@ class DecoderRNN(nn.Module):
         h_list = []
         for i in range(0,L):
             print 'embeddings[:,i,:]', embeddings[:,i,:]
-            next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));
-            print 'next_h', next_h
-            print 'next_c', next_c
+            # next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));
+
             # h_list.append(next_h);
         # hiddens = torch.cat(h_list);
         # outputs = self.linear(hiddens)
