@@ -19,11 +19,13 @@ import copy;
 GENCAP_DIR = './gen_cap/LSTM_EXP1.json'
 XODER_PATH = './models/EXP1/'
 dataDir='./coco'
+mypath = "./data/val_resized2014"
+# mypath = "./data/resized2014"
 VAL = 'val2014';
 TR = 'train2014';
 GEN_CAP_DIR = './gen_cap'
-# dataType='val2014'
-dataType='train2014'
+dataType='val2014'
+# dataType='train2014'
 annFile='{}/annotations/sm_captions_{}.json'.format(dataDir,dataType)
 print annFile
 coco = COCO(annFile)
@@ -52,9 +54,8 @@ class Args(object):
         return 'Arg[img_loc=%s, enc=%s, dec=%s, emb=%s, hid=%s, nlayer=%s]'%(self.image, self.encoder_path, \
                 self.decoder_path, self.embed_size, self.hidden_size, self.num_layers);
 
-# mypath = "./data/val_resized2014"
-mypath = "./data/resized2014"
-resize_set = set();
+
+
 for (dirpath, dirnames, filenames) in walk(mypath):
     pass;
 
