@@ -2,7 +2,7 @@ import argparse
 import os
 from PIL import Image
 
-max_file = 5000;
+max_file = 1000;
 
 def resize_image(image, size):
     """Resize an image to the given size."""
@@ -16,7 +16,7 @@ def resize_images(image_dir, output_dir, size):
     images = os.listdir(image_dir)
     num_images = len(images)
     for i, image in enumerate(images):
-        # if (i == max_file): break;
+        if (i == max_file): break;
         with open(os.path.join(image_dir, image), 'r+b') as f:
             with Image.open(f) as img:
                 img = resize_image(img, size)
@@ -36,11 +36,13 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--image_dir', type=str, default='./coco/train2014/',
+    # parser.add_argument('--image_dir', type=str, default='./coco/train2014/',
+    parser.add_argument('--image_dir', type=str, default='../old_coco/val2014/',
                         help='directory for train images')
-    parser.add_argument('--output_dir', type=str, default='./data/resized2014/',
+    parser.add_argument('--output_dir', type=str, default='./data/val_resized2014/',
                         help='directory for saving resized images')
     parser.add_argument('--image_size', type=int, default=256,
                         help='size for image after processing')
     args = parser.parse_args()
+    print args;
     main(args)
