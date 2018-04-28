@@ -109,7 +109,7 @@ for (dirpath, dirnames, filenames) in walk('./models'):
                 # gen_captions.append({'caption': caption, 'image_id': img_id});
                 GEN_CAPS.append(caption_obj);
             except Exception as e:
-                print '\n-- erorr on img_id', img_id, ,'\n',e,'\n';
+                print '\n-- erorr on img_id', img_id,'\n',e,'\n';
 
         EVAL_MAP[arg] = GEN_CAPS;
         break;
