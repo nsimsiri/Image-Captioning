@@ -51,10 +51,10 @@ def main(args):
     decoder = DecoderRNN(args.embed_size, args.hidden_size,
                          len(vocab), args.num_layers)
 
-    if torch.cuda.is_available():
-        print '---- USING GPU ---- '
-        encoder.cuda()
-        decoder.cuda()
+    # if torch.cuda.is_available():
+    #     print '---- USING GPU ---- '
+    #     encoder.cuda()
+    #     decoder.cuda()
 
     # Loss and Optimizer
     criterion = nn.CrossEntropyLoss()
