@@ -137,7 +137,6 @@ class COCO:
                 anns = self.dataset['annotations']
             anns = anns if len(catIds)  == 0 else [ann for ann in anns if ann['category_id'] in catIds]
             anns = anns if len(areaRng) == 0 else [ann for ann in anns if ann['area'] > areaRng[0] and ann['area'] < areaRng[1]]
-        print self.dataset.keys();
         if 'type' in self.dataset.keys() and self.dataset['type'] == 'instances':
             if not iscrowd == None:
                 ids = [ann['id'] for ann in anns if ann['iscrowd'] == iscrowd]
