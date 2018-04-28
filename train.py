@@ -7,8 +7,8 @@ import pickle
 from data_loader import get_loader
 from data_loader import get_loader_coco
 from build_vocab import Vocabulary
-from att_model import EncoderCNN, DecoderRNN
-# from model import EncoderCNN, DecoderRNN
+# from att_model import EncoderCNN, DecoderRNN
+from model import EncoderCNN, DecoderRNN
 from torch.autograd import Variable
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
@@ -21,6 +21,8 @@ def to_var(x, volatile=False):
     if torch.cuda.is_available():
         x = x.cuda()
     return Variable(x, volatile=volatile)
+
+def name_pretrained_sizes(nl, emb, hid, xoder, epoch, i): return '%d_%d_%d_%s-%d-%d.pkl' %(nl, emb, hid, xoder, epoch+1, i+1)
 
 def main(args):
     # Create model directory
@@ -51,10 +53,10 @@ def main(args):
     decoder = DecoderRNN(args.embed_size, args.hidden_size,
                          len(vocab), args.num_layers)
 
-    # if torch.cuda.is_available():
-    #     print '---- USING GPU ---- '
-    #     encoder.cuda()
-    #     decoder.cuda()
+    if torch.cuda.is_available():
+        print '---- USING GPU ---- '
+        encoder.cuda()
+        decoder.cuda()
 
     # Loss and Optimizer
     criterion = nn.CrossEntropyLoss()
@@ -66,7 +68,6 @@ def main(args):
     t0 = time.time();
     for epoch in range(args.num_epochs):
         for i, (images, captions, lengths) in enumerate(data_loader):
-
             # Set mini-batch dataset
             # print 'set-mb dataset --%s LEN:  %s'%(i, len(images))
             images = to_var(images, volatile=True)
@@ -85,10 +86,11 @@ def main(args):
             # print 'caption-shape',captions.shape;
             # print 'target-shape', targets.shape
             # print 'target2-shape', targets2.shape
-            loss = criterion(outputs, targets2) #targets
+            loss = criterion(outputs, targets) #targets
             loss.backward()
             optimizer.step()
             # Print log info
+            break;
 
             if i % args.log_step == 0:
                 print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
@@ -98,20 +100,24 @@ def main(args):
                 print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
 
             # Save the models
-            if (i+1) % args.save_step == 0:
-                torch.save(decoder.state_dict(),
-                           os.path.join(args.model_path,
-                                        'decoder-%d-%d.pkl' %(epoch+1, i+1)))
-                torch.save(encoder.state_dict(),
-                           os.path.join(args.model_path,
-                                        'encoder-%d-%d.pkl' %(epoch+1, i+1)))
+            # if (i+1) % args.save_step == 0:
+            #     torch.save(decoder.state_dict(),
+            #                os.path.join(args.model_path,
+            #                             name_pretrained_sizes(args.embed_size, args.hidden_size, "decoder")),
+            #                             # 'decoder-%d-%d.pkl' %(epoch+1, i+1)))
+            #     torch.save(encoder.state_dict(),
+            #                os.path.join(args.model_path,
+            #                             name_pretrained_sizes(args.embed_size, args.hidden_size, "encoder")),
+            #                             'encoder-%d-%d.pkl' %(epoch+1, i+1)))
     print 'saving final model';
     torch.save(decoder.state_dict(),
                os.path.join(args.model_path,
-                            'decoder-%d-%d.pkl' %(epoch+1, i+1)))
+                            name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "decoder", epoch, i)))
+                            # 'decoder-%d-%d.pkl' %(epoch+1, i+1)))
     torch.save(encoder.state_dict(),
                os.path.join(args.model_path,
-                            'encoder-%d-%d.pkl' %(epoch+1, i+1)))
+                            name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "encoder", epoch, i)))
+                            # 'encoder-%d-%d.pkl' %(epoch+1, i+1)))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -139,8 +145,8 @@ if __name__ == '__main__':
     parser.add_argument('--num_layers', type=int , default=1 ,
                         help='number of layers in lstm')
 
-    parser.add_argument('--num_epochs', type=int, default=5)
-    parser.add_argument('--batch_size', type=int, default=5) #128
+    parser.add_argument('--num_epochs', type=int, default=1)
+    parser.add_argument('--batch_size', type=int, default=25) #128
     parser.add_argument('--num_workers', type=int, default=2)
     parser.add_argument('--learning_rate', type=float, default=0.005)
     args = parser.parse_args()
