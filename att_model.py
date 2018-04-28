@@ -70,7 +70,7 @@ class DecoderRNN(nn.Module):
         self.affine_lstm_init.weight.data.uniform_(-0.1, 0.1)
         self.affine_lstm_init.bias.data.fill_(0)
 
-    def forward(self, features, captions, lengths):
+    def forward(self, projected_features, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
 
         N, T = captions.shape;

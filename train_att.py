@@ -76,8 +76,8 @@ def main(args):
             # Forward, Backward and Optimize
             decoder.zero_grad()
             encoder.zero_grad()
-            features = encoder(images)
-            outputs = decoder(features, captions, lengths)
+            projected_features, features = encoder(images)
+            outputs = decoder(projected_features, features, captions, lengths)
             # print 'features.shape', features.shape (batch_size, )
             # print 'captions.shape', captions.shape
             # print 'output', outputs.shape;

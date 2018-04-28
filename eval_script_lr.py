@@ -18,7 +18,7 @@ import copy;
 import pickle
 
 
-GENCAP_DIR = './gen_caps/LSTM_EXP2.pkl'
+GENCAP_DIR = './gen_caps/LSTM_EXP2_LR.pkl'
 XODER_PATH = './models/EXP2/'
 dataDir='./coco'
 mypath = "./data/val_resized2014"
@@ -29,7 +29,7 @@ GEN_CAP_DIR = './gen_caps'
 dataType='val2014'
 # dataType='train2014'
 annFile='{}/annotations/sm_captions_{}.json'.format(dataDir,dataType)
-print 'running eval_script_lr on caption=%s xoder=%s dataType=%s annFile=%s'%(GENCAP_DIR, XODER_PATH, dataType, annFile);
+print 'running eval_script_lr on caption=%s xoder=%s dataType=%s annFile=%s'%(GENCAP_DIR, XODER_PATH, dataType, annFile)
 coco = COCO(annFile)
 imgIds = coco.getImgIds()
 print 'Annotations', len(coco.getAnnIds());
