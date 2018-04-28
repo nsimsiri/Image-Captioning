@@ -23,7 +23,7 @@ mypath = "./data/val_resized2014"
 # mypath = "./data/resized2014"
 VAL = 'val2014';
 TR = 'train2014';
-GEN_CAP_DIR = './gen_cap'
+GEN_CAP_DIR = './gen_caps'
 dataType='val2014'
 # dataType='train2014'
 annFile='{}/annotations/sm_captions_{}.json'.format(dataDir,dataType)
@@ -59,7 +59,7 @@ class Args(object):
 for (dirpath, dirnames, filenames) in walk(mypath):
     pass;
 
-for (dirpath, dirnames, filenames) in walk('./models'):
+for (dirpath, dirnames, filenames) in walk(XODER_PATH):
     arg2xoder = defaultdict(dict);
     for fn in filenames:
         for xoder in ['decoder', 'encoder']:
