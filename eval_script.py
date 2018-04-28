@@ -17,7 +17,7 @@ import json
 import copy;
 
 GENCAP_DIR = './gen_cap/LSTM_EXP1.json'
-XODER_PATH = './models/'
+XODER_PATH = './models/EXP1/'
 dataDir='./coco'
 VAL = 'val2014';
 TR = 'train2014';
