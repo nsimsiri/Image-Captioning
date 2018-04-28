@@ -83,9 +83,9 @@ for (dirpath, dirnames, filenames) in walk('./models'):
             img = coco.loadImgs(img_id)[0] # index 0 because only 1 img return ie. coco.loadImgs.. = [img_we_want]
             args = Args(img['file_name'], hardpath=('./data/val_resized2014' if dataType==VAL else './data/resized2014'), \
                         enc=xoder2fn['encoder'], dec=xoder2fn['decoder']);
-            args.num_layers = num_layers;
-            args.embed_size = embed_size;
-            args.hidden_size = hidden_size;
+            args.num_layers = int(num_layers);
+            args.embed_size = int(embed_size);
+            args.hidden_size = int(hidden_size);
             coco.dataset['type'] = None; # to fix bug with diff versio.
             annIds = coco.getAnnIds(imgIds=[img['id']])
             ann = coco.loadAnns(annIds)
