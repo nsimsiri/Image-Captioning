@@ -82,8 +82,8 @@ def main(args):
             # print 'Forward, Backward and Optimize -- %s'%(i)
             decoder.zero_grad()
             encoder.zero_grad()
-            features = encoder(images)
-            outputs = decoder(features, captions, lengths)
+            proj_features, features = encoder(images)
+            outputs = decoder(proj_features, captions, lengths)
 
             loss = criterion(outputs, targets) #targets
             loss.backward()

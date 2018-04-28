@@ -68,23 +68,22 @@ def main(args):
     for epoch in range(args.num_epochs):
         for i, (images, captions, lengths) in enumerate(data_loader):
             # Set mini-batch dataset
-            # print 'set-mb dataset --%s LEN:  %s'%(i, len(images))
             images = to_var(images, volatile=True)
             captions = to_var(captions)
             targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
             targets2 = captions.view((captions.shape[0]*captions.shape[1], ));
 
             # Forward, Backward and Optimize
-            # print 'Forward, Backward and Optimize -- %s'%(i)
             decoder.zero_grad()
             encoder.zero_grad()
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
-
-            print 'output', outputs.shape;
+            # print 'features.shape', features.shape (batch_size, )
+            # print 'captions.shape', captions.shape
+            # print 'output', outputs.shape;
             # print 'caption-shape',captions.shape;
             # print 'target-shape', targets.shape
-            print 'target2-shape', targets2.shape
+            # print 'target2-shape', targets2.shape
             loss = criterion(outputs, targets2) #targets
             loss.backward()
             optimizer.step()
@@ -147,7 +146,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_epochs', type=int, default=1)
     parser.add_argument('--batch_size', type=int, default=5) #128
     parser.add_argument('--num_workers', type=int, default=2)
-    parser.add_argument('--learning_rate', type=float, default=0.01)
+    parser.add_argument('--learning_rate', type=float, default=0.005)
     args = parser.parse_args()
     print(args)
     main(args)
