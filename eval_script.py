@@ -17,6 +17,7 @@ import json
 import copy;
 
 GENCAP_DIR = './gen_cap/LSTM_EXP1.json'
+XODER_PATH = './models/'
 dataDir='./coco'
 VAL = 'val2014';
 TR = 'train2014';
@@ -37,8 +38,8 @@ class Args(object):
             img_location = hardpath+"/"+img_file_name;
 #         self.encoder_path = './models/encoder-5-3000.pkl'
 #         self.decoder_path = './models/decoder-5-3000.pkl'
-        self.encoder_path = enc#'./models/1_256_512_encoder-5-1001.pkl'
-        self.decoder_path = dec#'./models/1_256_512_decoder-5-1001.pkl'
+        self.encoder_path = XODER_PATH + enc#'./models/1_256_512_encoder-5-1001.pkl'
+        self.decoder_path = XODER_PATH + dec#'./models/1_256_512_decoder-5-1001.pkl'
         self.vocab_path = './data/vocab.pkl'
         self.embed_size = 256
         self.hidden_size = 512;
