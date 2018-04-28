@@ -15,8 +15,9 @@ import sys;
 from collections import defaultdict
 import json
 import copy;
+import pickle
 
-GENCAP_DIR = './gen_cap/LSTM_EXP1.json'
+GENCAP_DIR = './gen_cap/LSTM_EXP1.pkl'
 XODER_PATH = './models/EXP1/'
 dataDir='./coco'
 mypath = "./data/val_resized2014"
@@ -116,10 +117,9 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
         break;
 
     print 'Dumping EVAL_MAP json...';
-    data_json = json.dumps(EVAL_MAP)
     with open(GENCAP_DIR, 'wb') as handle:
         print 'writing to ', GENCAP_DIR;
-        handle.write(data_json)
+        pickle.dump(EVAL_MAP, handle)
     print 'done';
 # caption generator
 # a_time = time.time()
