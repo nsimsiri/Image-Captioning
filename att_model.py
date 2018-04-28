@@ -39,7 +39,7 @@ class DecoderRNN(nn.Module):
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
-        self.affine_lstm_init = nn.Linear(embed_size, hidden_size);
+        # self.affine_lstm_init = nn.Linear(embed_size, hidden_size);
         self.lstm_cell = nn.LSTMCell(embed_size, hidden_size);
         self.init_weights();
         self.hidden_size = hidden_size;
@@ -62,8 +62,8 @@ class DecoderRNN(nn.Module):
         self.embed.weight.data.uniform_(-0.1, 0.1)
         self.linear.weight.data.uniform_(-0.1, 0.1)
         self.linear.bias.data.fill_(0)
-        self.affine_lstm_init.weight.data.uniform_(-0.1, 0.1)
-        self.affine_lstm_init.bias.data.fill_(0)
+        # self.affine_lstm_init.weight.data.uniform_(-0.1, 0.1)
+        # self.affine_lstm_init.bias.data.fill_(0)
 
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""

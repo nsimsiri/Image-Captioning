@@ -7,8 +7,8 @@ import pickle
 from data_loader import get_loader
 from data_loader import get_loader_coco
 from build_vocab import Vocabulary
-# from att_model import EncoderCNN, DecoderRNN
-from model import EncoderCNN, DecoderRNN
+from att_model import EncoderCNN, DecoderRNN
+# from model import EncoderCNN, DecoderRNN
 from torch.autograd import Variable
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
@@ -88,12 +88,11 @@ def main(args):
             outputs = decoder(features, captions, lengths)
 
             # print 'output', outputs.shape;
-            # print 'target', targets;
-            # print 'caption', captions;
             # print 'caption-shape',captions.shape;
             # print 'target-shape', targets.shape
             # print 'target2-shape', targets2.shape
-            loss = criterion(outputs, targets) #targets
+            
+            loss = criterion(outputs, targets2) #targets
             loss.backward()
             optimizer.step()
             # Print log info
