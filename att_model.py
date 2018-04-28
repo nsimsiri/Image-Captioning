@@ -31,32 +31,50 @@ class EncoderCNN(nn.Module):
 
 
 class DecoderRNN(nn.Module):
-    def __init__(self, embed_size, hidden_size, vocab_size, num_layers):
+    def __init__(self, embed_size, hidden_size, vocab_size, num_layers, ):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
         print 'embed_size: ',embed_size, 'hidden_size: ',hidden_size, 'vocab_size: ',vocab_size, 'num_layers: ',num_layers
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
+        self.affine_lstm_init = nn.Linear(embed_size, hidden_size);
         self.lstm_cell = nn.LSTMCell(embed_size, hidden_size);
         self.init_weights();
         self.hidden_size = hidden_size;
         self.embed_size = embed_size;
+
+        # self.fc_feat_size = fc_feat_size
+        # self.att_feat_size = att_feat_size
+        # self.att_hid_size = oatt_hid_size
+        #
+        # if self.att_hid_size > 0:
+        #     self.ctx2att = nn.Linear(self.att_feat_size, self.att_hid_size)
+        #     self.h2att = nn.Linear(self.hidden_size, self.att_hid_size)
+        #     self.alpha_net = nn.Linear(self.att_hid_size, 1)
+        # else:
+        #     self.ctx2att = nn.Linear(self.att_feat_size, 1)
+        #     self.h2att = nn.Linear(self.rnn_size, 1)
+
     def init_weights(self):
         """Initialize weights."""
         self.embed.weight.data.uniform_(-0.1, 0.1)
         self.linear.weight.data.uniform_(-0.1, 0.1)
         self.linear.bias.data.fill_(0)
+        self.affine_lstm_init.weight.data.uniform_(-0.1, 0.1)
+        self.affine_lstm_init.bias.data.fill_(0)
 
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
-        print 'captio.shape', captions.shape
         N, L = captions.shape;
         embeddings = self.embed(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         next_c = Variable(torch.zeros(N, self.hidden_size))
-        next_h = Variable(torch.zeros(N, self.hidden_size))
-        hiddens = torch.zeros((L, N, self.hidden_size));
+        # next_h = Variable(torch.zeros(N, self.hidden_size))
+        next_h = self.affine_lstm_init(embeddings[:,0,:]);
+        # print 'h0', next_h.shape
+        # print 'h0 want', (N, self.hidden_size);
+        # assert(next_h.shape == (N, self.hidden_size));
         h_list = []
         for i in range(0,L):
             next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));

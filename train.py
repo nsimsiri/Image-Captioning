@@ -92,6 +92,7 @@ def main(args):
             encoder.zero_grad()
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
+
             # print 'output', outputs.shape;
             # print 'target', targets;
             # print 'caption', captions;
@@ -118,6 +119,13 @@ def main(args):
                 torch.save(encoder.state_dict(),
                            os.path.join(args.model_path,
                                         'encoder-%d-%d.pkl' %(epoch+1, i+1)))
+    print 'saving final model';
+    torch.save(decoder.state_dict(),
+               os.path.join(args.model_path,
+                            'decoder-%d-%d.pkl' %(epoch+1, i+1)))
+    torch.save(encoder.state_dict(),
+               os.path.join(args.model_path,
+                            'encoder-%d-%d.pkl' %(epoch+1, i+1)))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -134,13 +142,13 @@ if __name__ == '__main__':
                         help='path for train annotation json file')
     parser.add_argument('--log_step', type=int , default=10,
                         help='step size for prining log info')
-    parser.add_argument('--save_step', type=int , default=50,
+    parser.add_argument('--save_step', type=int , default=500,
                         help='step size for saving trained models')
 
     # Model parameters
     parser.add_argument('--embed_size', type=int , default=256 , #256
                         help='dimension of word embedding vectors')
-    parser.add_argument('--hidden_size', type=int , default=512 , #512
+    parser.add_argument('--hidden_size', type=int , default=612 , #512
                         help='dimension of lstm hidden states')
     parser.add_argument('--num_layers', type=int , default=1 ,
                         help='number of layers in lstm')
@@ -148,7 +156,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_epochs', type=int, default=5)
     parser.add_argument('--batch_size', type=int, default=25) #128
     parser.add_argument('--num_workers', type=int, default=2)
-    parser.add_argument('--learning_rate', type=float, default=0.01)
+    parser.add_argument('--learning_rate', type=float, default=0.005)
     args = parser.parse_args()
     print(args)
     main(args)
