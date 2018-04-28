@@ -63,9 +63,15 @@ class DecoderRNN(nn.Module):
         next_c = Variable(torch.zeros(N, self.hidden_size))
         # next_h = Variable(torch.zeros(N, self.hidden_size))
         next_h = self.affine_lstm_init(features);
+        print 'embeddings', embeddings;
+        print 'next_h', next_h
+        print 'next_c', next_c
         h_list = []
         for i in range(0,L):
+            print 'embeddings[:,i,:]', embeddings[:,i,:]
             next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));
+            print 'next_h', next_h
+            print 'next_c', next_c
             # h_list.append(next_h);
         # hiddens = torch.cat(h_list);
         # outputs = self.linear(hiddens)
