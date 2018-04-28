@@ -7,8 +7,7 @@ import pickle
 from data_loader import get_loader
 from data_loader import get_loader_coco
 from build_vocab import Vocabulary
-# from att_model import EncoderCNN, DecoderRNN
-from model import EncoderCNN, DecoderRNN
+from model_gru import EncoderCNN, DecoderRNN
 from torch.autograd import Variable
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms

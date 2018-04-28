@@ -23,7 +23,7 @@ def to_var(x, volatile=False):
     return Variable(x, volatile=volatile)
 
 def name_pretrained_sizes(nl, emb, hid, xoder, epoch, i): return '%d_%d_%d_%s-%d-%d.pkl' %(nl, emb, hid, xoder, epoch+1, i+1)
-def name_pretrained_lr(lr_mag, epoch, i):
+def name_pretrained_lr(lr_mag, xoder, epoch, i):
     s = str(lr_mag).replace('.','');
     return 'learning-%d-%d-%d.pkl' %(s,xoder, epoch+1, i+1)
 
