@@ -2,3 +2,4 @@
 /models
 /models/baseline/*
 /.ipynb_checkpoints
+/gen_caps
