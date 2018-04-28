@@ -31,7 +31,7 @@ class EncoderCNN(nn.Module):
 
 
 class DecoderRNN(nn.Module):
-    def __init__(self, embed_size, hidden_size, vocab_size, num_layers, ):
+    def __init__(self, embed_size, hidden_size, vocab_size, num_layers ):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
         print 'embed_size: ',embed_size, 'hidden_size: ',hidden_size, 'vocab_size: ',vocab_size, 'num_layers: ',num_layers
@@ -58,6 +58,7 @@ class DecoderRNN(nn.Module):
         print features;
         print '---------\n'
         N, L = captions.shape;
+        print 'captions', captions
         embeddings = self.embed(captions)
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         next_c = Variable(torch.zeros(N, self.hidden_size)) #need cuda
