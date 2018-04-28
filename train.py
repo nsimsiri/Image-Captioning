@@ -90,7 +90,6 @@ def main(args):
             loss.backward()
             optimizer.step()
             # Print log info
-            break;
 
             if i % args.log_step == 0:
                 print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
