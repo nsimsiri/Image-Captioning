@@ -70,7 +70,6 @@ def main(args):
     total_step = len(data_loader)
     t0 = time.time();
     for epoch in range(args.num_epochs):
-        print type(data_loader);
 
         # # print data_loader
         # # print len(data_loader);
