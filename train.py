@@ -44,8 +44,13 @@ def main(args):
     data_loader = get_loader(args.image_dir, args.caption_path, vocab,
                              transform, args.batch_size,
                              shuffle=True, num_workers=args.num_workers)
-
-    print '----- DATA_LOADER -- loaded data ----'
+    # coco = get_loader_coco(args.image_dir, args.caption_path, vocab,
+    #                          transform, args.batch_size,
+    #                          shuffle=True, num_workers=args.num_workers)
+    # print coco
+    # print len(coco.ids)
+    # sys.exit()
+    # data = json.load(open('./coco/annotations/sm_captions_train2014.json'));
     # Build the models
     encoder = EncoderCNN(args.embed_size)
     decoder = DecoderRNN(args.embed_size, args.hidden_size,
@@ -65,6 +70,7 @@ def main(args):
     total_step = len(data_loader)
     t0 = time.time();
     for epoch in range(args.num_epochs):
+        print type(data_loader);
 
         # # print data_loader
         # # print len(data_loader);
@@ -86,12 +92,12 @@ def main(args):
             encoder.zero_grad()
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
-
             # print 'output', outputs.shape;
+            # print 'target', targets;
+            # print 'caption', captions;
             # print 'caption-shape',captions.shape;
             # print 'target-shape', targets.shape
             # print 'target2-shape', targets2.shape
-            
             loss = criterion(outputs, targets2) #targets
             loss.backward()
             optimizer.step()
@@ -112,13 +118,6 @@ def main(args):
                 torch.save(encoder.state_dict(),
                            os.path.join(args.model_path,
                                         'encoder-%d-%d.pkl' %(epoch+1, i+1)))
-    print 'saving final model';
-    torch.save(decoder.state_dict(),
-               os.path.join(args.model_path,
-                            'decoder-%d-%d.pkl' %(epoch+1, i+1)))
-    torch.save(encoder.state_dict(),
-               os.path.join(args.model_path,
-                            'encoder-%d-%d.pkl' %(epoch+1, i+1)))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -135,21 +134,21 @@ if __name__ == '__main__':
                         help='path for train annotation json file')
     parser.add_argument('--log_step', type=int , default=10,
                         help='step size for prining log info')
-    parser.add_argument('--save_step', type=int , default=500,
+    parser.add_argument('--save_step', type=int , default=50,
                         help='step size for saving trained models')
 
     # Model parameters
-    parser.add_argument('--embed_size', type=int , default=32 , #256
+    parser.add_argument('--embed_size', type=int , default=256 , #256
                         help='dimension of word embedding vectors')
-    parser.add_argument('--hidden_size', type=int , default=64 , #512
+    parser.add_argument('--hidden_size', type=int , default=512 , #512
                         help='dimension of lstm hidden states')
     parser.add_argument('--num_layers', type=int , default=1 ,
                         help='number of layers in lstm')
 
     parser.add_argument('--num_epochs', type=int, default=5)
-    parser.add_argument('--batch_size', type=int, default=5) #128
+    parser.add_argument('--batch_size', type=int, default=25) #128
     parser.add_argument('--num_workers', type=int, default=2)
-    parser.add_argument('--learning_rate', type=float, default=0.005)
+    parser.add_argument('--learning_rate', type=float, default=0.01)
     args = parser.parse_args()
     print(args)
     main(args)
