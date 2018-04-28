@@ -133,7 +133,7 @@ if __name__ == '__main__':
     parser.add_argument('--caption_path', type=str,
                         default='./coco/annotations/sm_captions_train2014.json',
                         help='path for train annotation json file')
-    parser.add_argument('--log_step', type=int , default=10,
+    parser.add_argument('--log_step', type=int , default=500,
                         help='step size for prining log info')
     parser.add_argument('--save_step', type=int , default=500,
                         help='step size for saving trained models')
