@@ -64,9 +64,10 @@ class DecoderRNN(nn.Module):
         h_list = []
         for i in range(0,L):
             next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));
-            h_list.append(next_h);
-        hiddens = torch.cat(h_list);
-        outputs = self.linear(hiddens)
+            # h_list.append(next_h);
+        # hiddens = torch.cat(h_list);
+        # outputs = self.linear(hiddens)
+        outputs = self.linear(next_h);
         return outputs;
 
     def sample(self, features, states=None):
