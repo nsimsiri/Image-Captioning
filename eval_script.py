@@ -114,7 +114,6 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
                 print '\n-- erorr on img_id', img_id,'\n',e,'\n';
 
         EVAL_MAP[arg] = GEN_CAPS;
-        break;
 
     print 'Dumping EVAL_MAP json...';
     with open(GENCAP_DIR, 'wb') as handle:
