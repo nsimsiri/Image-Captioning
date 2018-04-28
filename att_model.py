@@ -4,6 +4,7 @@ import torchvision.models as models
 from torch.nn.utils.rnn import pack_padded_sequence
 from torch.autograd import Variable
 from OldModel import *;
+import sys;
 
 class EncoderCNN(nn.Module):
     def __init__(self, embed_size):
@@ -71,15 +72,11 @@ class DecoderRNN(nn.Module):
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         next_c = Variable(torch.zeros(N, self.hidden_size))
         # next_h = Variable(torch.zeros(N, self.hidden_size))
-        next_h = self.affine_lstm_init(embeddings[:,0,:]);
-        # print 'h0', next_h.shape
-        # print 'h0 want', (N, self.hidden_size);
-        # assert(next_h.shape == (N, self.hidden_size));
+        next_h = self.affine_lstm_init(features);
         h_list = []
         for i in range(0,L):
             next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));
             h_list.append(next_h);
-        # packed = pack_padded_sequence(embeddings, lengths, batch_first=True);
         hiddens = torch.cat(h_list);
         outputs = self.linear(hiddens)
         return outputs;
