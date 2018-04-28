@@ -69,10 +69,10 @@ class DecoderRNN(nn.Module):
         """Decode image feature vectors and generates captions."""
         N, L = captions.shape;
         embeddings = self.embed(captions)
-        # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
+        # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)    g
         next_c = Variable(torch.zeros(N, self.hidden_size))
-        # next_h = Variable(torch.zeros(N, self.hidden_size))
-        next_h = self.affine_lstm_init(features);
+        next_h = Variable(torch.zeros(N, self.hidden_size))
+        # next_h = self.affine_lstm_init(features);
         h_list = []
         for i in range(0,L):
             next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));
