@@ -3,6 +3,7 @@ import torch.nn as nn
 import torchvision.models as models
 from torch.nn.utils.rnn import pack_padded_sequence
 from torch.autograd import Variable
+import torch.nn.functional as F
 from OldModel import *;
 import sys;
 
@@ -27,17 +28,14 @@ class EncoderCNN(nn.Module):
     def init_weights(self):
         """Initialize the weights."""
         # self.linear.weight.data.normal_(0.0, 0.02)
-        torch.nn.init.xavier_uniform(self.linear.weight)
+        torch.nn.init.xavier_uniform_(self.linear.weight)
         self.linear.bias.data.fill_(0)
 
     #(N,L,D) --> (N,L,D)
     def _project_features(self,features):
-        # w = tf.get_variable('w', [self.D, self.D], initializer=self.weight_initializer)
-        features_flat = features.view(-1, self.D);
-        # features_flat = tf.reshape(features, [-1, self.D])
-        # features_proj = tf.reshape(features_proj, [-1, self.L, self.D])
+        features_flat = features.contiguous().view(-1, self.D);
         features_proj = self.linear(features_flat);
-        features_proj = features.view(-1, self.L, self.D);
+        features_proj = features.contiguous().view(-1, self.L, self.D);
         return features_proj
 
 
@@ -52,14 +50,12 @@ class EncoderCNN(nn.Module):
         att_features = att_features.permute(0,2,1); # (N,L,D)
 
         features_proj = self._project_features(att_features);
-        print 'features_proj', features_proj.shape;
-        sys.exit();
-        features = features.view(features.size(0), -1)
-        print 'features2', features.shape
-        proj_features = self.bn(self.linear(features))
-        print 'features.shape', proj_features.shape
-        sys.exit();
-        return proj_features, att_features;
+        # print 'features_proj', features_proj.shape;
+        # features = features.view(features.size(0), -1)
+        # print 'features2', features.shape
+        # proj_features = self.bn(self.linear(features))
+        # print 'features.shape', proj_features.shape
+        return features_proj, att_features;
 
 
 class DecoderRNN(nn.Module):
@@ -74,10 +70,16 @@ class DecoderRNN(nn.Module):
         print 'embed_size(M): ',embed_size, 'hidden_size(H): ',hidden_size, \
         'vocab_size(V): ',vocab_size, 'L: ', self.L, 'D: ', self.D, 'num_layers: ',num_layers
         self.embed = nn.Embedding(self.V, self.M)
-        self.lstm = nn.LSTM(self.M, self.H, num_layers, batch_first=True)
+        # self.lstm = nn.LSTM(self.M, self.H, num_layers, batch_first=True)
         self.linear = nn.Linear(self.H, self.V)
-        self.affine_lstm_init = nn.Linear(self.M, self.H);
+        # encode feature
+        self._affine_lstm_init = nn.Linear(self.D, self.H);
+        # attention sub-layers
+        self._affine_feat_proj_att = nn.Linear(self.H, self.D);
+        self._affine_att = nn.Linear(self.D, 1);
+        # LSTM cell
         self.lstm_cell = nn.LSTMCell(self.M, self.H);
+
         self.init_weights();
         self.hidden_size = hidden_size;
         self.embed_size = embed_size;
@@ -85,14 +87,48 @@ class DecoderRNN(nn.Module):
         T = n_time_step
         N = batch size
         '''
+
     def init_weights(self):
         """Initialize weights."""
         self.embed.weight.data.uniform_(-0.1, 0.1)
         self.linear.weight.data.uniform_(-0.1, 0.1)
         self.linear.bias.data.fill_(0)
-        self.affine_lstm_init.weight.data.uniform_(-0.1, 0.1)
-        self.affine_lstm_init.bias.data.fill_(0)
 
+        self._affine_lstm_init.bias.data.fill_(0)
+        torch.nn.init.xavier_uniform_(self._affine_lstm_init.weight)
+        # attention sub-layers
+        torch.nn.init.xavier_uniform_(self._affine_feat_proj_att.weight);
+        torch.nn.init.xavier_uniform_(self._affine_att.weight);
+        self._affine_feat_proj_att.bias.data.fill_(0);
+        self._affine_att.bias.data.fill_(0);
+
+    #(N, L, D) features
+    def affine_lstm_init(self, features):
+        features = torch.mean(features,  1); #(N, H)
+        h = self._affine_lstm_init(features);
+        relu = nn.ReLU();
+        h = relu(h);
+        return h;
+
+    def attention_layer(self, h, projected_features, features):
+        relu = nn.ReLU();
+        softmax = nn.Softmax();
+
+        h_out = self._affine_feat_proj_att(h);
+        h_out = h_out.unsqueeze(1);
+        relu_in = projected_features + h_out;
+        # print relu_in.shape;
+        h_out = relu(relu_in); #(N, L, D)
+        N, _ , _ = h_out.shape;
+        print 'N', N;
+        e_it = self._affine_att(h_out.contiguous().view(N * self.L, self.D)); # (N*L, D) x (D, 1)
+        e_it = e_it.contiguous().view(N, self.L);
+        alpha = softmax(att_out);
+        print 'att_out', att_out.shape;
+        return None;
+
+
+    # projected_features (N,L,D), features (N,L,D),
     def forward(self, projected_features, features, captions, lengths):
         """Decode image feature vectors and generates captions.
             projected_features.shape = (N, L*D), i.e (5, 49*2048 = 100352)
@@ -100,9 +136,14 @@ class DecoderRNN(nn.Module):
         """
         N, T = captions.shape;
         embeddings = self.embed(captions) # = (N, M)
-        next_c = Variable(torch.zeros(N, self.hidden_size))#.cuda() #need cuda
-        next_h = self.affine_lstm_init(projected_features); # (N,L,D) * ()
+        next_c = Variable(torch.zeros(N, self.H))#.cuda() #need cuda
+        next_h = self.affine_lstm_init(projected_features); # (N,H)
+        print 'embeddings', embeddings.shape
+        print 'next_c', next_c.shape;
+        print 'next_h', next_h.shape
+        alphas = [];
         h_list = []
+        self.attention_layer(next_h, projected_features, features);
         print ("OK!!");
         sys.exit()
         for i in range(0,T):
