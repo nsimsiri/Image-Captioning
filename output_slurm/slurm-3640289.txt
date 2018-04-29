@@ -1,0 +1,182 @@
+Namespace(batch_size=25, caption_path='./coco/annotations/sm_captions_train2014.json', crop_size=224, embed_size=128, hidden_size=256, image_dir='./data/resized2014', learning_rate=1e-05, log_step=500, model_path='./models/GRU_LR', num_epochs=5, num_layers=1, num_workers=2, save_step=500, vocab_path='./data/vocab.pkl')
+loading annotations into memory...
+0:00:00.107816
+creating index...
+index created!
+----- DATA_LOADER -- loaded data ----
+---- USING GPU ---- 
+train_gru_lr.py:22: UserWarning: volatile was removed and now has no effect. Use `with torch.no_grad():` instead.
+  return Variable(x, volatile=volatile)
+train_gru_lr.py:100: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  loss.data[0], np.exp(loss.data[0]), time.time()-t0))
+Epoch [0/5], Step [0/1001], Loss: 9.1972, Perplexity: 9869.8965, Time: 0.4676
+Epoch [0/5], Step [500/1001], Loss: 8.7909, Perplexity: 6574.2354, Time: 97.7448
+Epoch [0/5], Step [1000/1001], Loss: 6.0722, Perplexity: 433.6447, Time: 200.0572
+Epoch [1/5], Step [0/1001], Loss: 6.2029, Perplexity: 494.1695, Time: 200.6209
+Epoch [1/5], Step [500/1001], Loss: 5.7475, Perplexity: 313.3929, Time: 302.9273
+Epoch [1/5], Step [1000/1001], Loss: 5.6184, Perplexity: 275.4351, Time: 404.7962
+Epoch [2/5], Step [0/1001], Loss: 5.7141, Perplexity: 303.1131, Time: 405.2846
+Epoch [2/5], Step [500/1001], Loss: 5.3372, Perplexity: 207.9247, Time: 506.1135
+Epoch [2/5], Step [1000/1001], Loss: 5.3124, Perplexity: 202.8365, Time: 607.8514
+Epoch [3/5], Step [0/1001], Loss: 5.2910, Perplexity: 198.5461, Time: 608.3362
+Epoch [3/5], Step [500/1001], Loss: 5.1179, Perplexity: 166.9869, Time: 711.6743
+Epoch [3/5], Step [1000/1001], Loss: 5.0185, Perplexity: 151.1859, Time: 815.5097
+Epoch [4/5], Step [0/1001], Loss: 4.9659, Perplexity: 143.4441, Time: 815.9850
+Epoch [4/5], Step [500/1001], Loss: 4.6663, Perplexity: 106.2989, Time: 917.0464
+train_gru_lr.py:116: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
+Epoch [4/5], Step [1000/1001], Loss: 4.7843, Perplexity: 119.6168, Time: 1018.7187
+saving final model
+1000 - loss: 4.7843 - time: 1018.9230
+Namespace(batch_size=25, caption_path='./coco/annotations/sm_captions_train2014.json', crop_size=224, embed_size=128, hidden_size=256, image_dir='./data/resized2014', learning_rate=0.0001, log_step=500, model_path='./models/GRU_LR', num_epochs=5, num_layers=1, num_workers=2, save_step=500, vocab_path='./data/vocab.pkl')
+loading annotations into memory...
+0:00:00.102922
+creating index...
+index created!
+----- DATA_LOADER -- loaded data ----
+---- USING GPU ---- 
+train_gru_lr.py:22: UserWarning: volatile was removed and now has no effect. Use `with torch.no_grad():` instead.
+  return Variable(x, volatile=volatile)
+train_gru_lr.py:100: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  loss.data[0], np.exp(loss.data[0]), time.time()-t0))
+Epoch [0/5], Step [0/1001], Loss: 9.2081, Perplexity: 9977.7676, Time: 0.5154
+Epoch [0/5], Step [500/1001], Loss: 4.5889, Perplexity: 98.3870, Time: 103.7728
+Epoch [0/5], Step [1000/1001], Loss: 4.0913, Perplexity: 59.8185, Time: 212.5622
+Epoch [1/5], Step [0/1001], Loss: 4.4054, Perplexity: 81.8931, Time: 213.1415
+Epoch [1/5], Step [500/1001], Loss: 4.4122, Perplexity: 82.4529, Time: 316.4421
+Epoch [1/5], Step [1000/1001], Loss: 4.1096, Perplexity: 60.9212, Time: 419.2069
+Epoch [2/5], Step [0/1001], Loss: 3.8426, Perplexity: 46.6473, Time: 419.7147
+Epoch [2/5], Step [500/1001], Loss: 3.9344, Perplexity: 51.1307, Time: 522.4800
+Epoch [2/5], Step [1000/1001], Loss: 3.6294, Perplexity: 37.6886, Time: 625.2038
+Epoch [3/5], Step [0/1001], Loss: 3.5330, Perplexity: 34.2264, Time: 625.7561
+Epoch [3/5], Step [500/1001], Loss: 3.4399, Perplexity: 31.1829, Time: 727.6155
+Epoch [3/5], Step [1000/1001], Loss: 3.4460, Perplexity: 31.3742, Time: 833.4589
+Epoch [4/5], Step [0/1001], Loss: 3.8940, Perplexity: 49.1050, Time: 834.3272
+Epoch [4/5], Step [500/1001], Loss: 3.6085, Perplexity: 36.9093, Time: 941.2362
+train_gru_lr.py:116: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
+Epoch [4/5], Step [1000/1001], Loss: 3.2551, Perplexity: 25.9217, Time: 1044.7878
+saving final model
+1000 - loss: 3.2551 - time: 1044.7903
+Namespace(batch_size=25, caption_path='./coco/annotations/sm_captions_train2014.json', crop_size=224, embed_size=128, hidden_size=256, image_dir='./data/resized2014', learning_rate=0.001, log_step=500, model_path='./models/GRU_LR', num_epochs=5, num_layers=1, num_workers=2, save_step=500, vocab_path='./data/vocab.pkl')
+loading annotations into memory...
+0:00:00.101015
+creating index...
+index created!
+----- DATA_LOADER -- loaded data ----
+---- USING GPU ---- 
+train_gru_lr.py:22: UserWarning: volatile was removed and now has no effect. Use `with torch.no_grad():` instead.
+  return Variable(x, volatile=volatile)
+train_gru_lr.py:100: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  loss.data[0], np.exp(loss.data[0]), time.time()-t0))
+Epoch [0/5], Step [0/1001], Loss: 9.2140, Perplexity: 10036.8906, Time: 0.4704
+Epoch [0/5], Step [500/1001], Loss: 3.5027, Perplexity: 33.2055, Time: 102.4993
+Epoch [0/5], Step [1000/1001], Loss: 2.7621, Perplexity: 15.8326, Time: 209.6844
+Epoch [1/5], Step [0/1001], Loss: 2.9148, Perplexity: 18.4457, Time: 210.2124
+Epoch [1/5], Step [500/1001], Loss: 3.0401, Perplexity: 20.9082, Time: 314.2348
+Epoch [1/5], Step [1000/1001], Loss: 2.7819, Perplexity: 16.1493, Time: 416.9646
+Epoch [2/5], Step [0/1001], Loss: 2.2889, Perplexity: 9.8642, Time: 417.8320
+Epoch [2/5], Step [500/1001], Loss: 2.5334, Perplexity: 12.5958, Time: 519.0304
+Epoch [2/5], Step [1000/1001], Loss: 2.2884, Perplexity: 9.8594, Time: 620.6197
+Epoch [3/5], Step [0/1001], Loss: 2.4527, Perplexity: 11.6193, Time: 621.1419
+Epoch [3/5], Step [500/1001], Loss: 2.2809, Perplexity: 9.7851, Time: 723.4411
+Epoch [3/5], Step [1000/1001], Loss: 2.2511, Perplexity: 9.4986, Time: 828.2811
+Epoch [4/5], Step [0/1001], Loss: 1.9331, Perplexity: 6.9106, Time: 828.8026
+Epoch [4/5], Step [500/1001], Loss: 2.2571, Perplexity: 9.5555, Time: 930.9259
+train_gru_lr.py:116: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
+Epoch [4/5], Step [1000/1001], Loss: 2.1196, Perplexity: 8.3280, Time: 1032.5971
+saving final model
+1000 - loss: 2.1196 - time: 1032.5994
+Namespace(batch_size=25, caption_path='./coco/annotations/sm_captions_train2014.json', crop_size=224, embed_size=128, hidden_size=256, image_dir='./data/resized2014', learning_rate=0.01, log_step=500, model_path='./models/GRU_LR', num_epochs=5, num_layers=1, num_workers=2, save_step=500, vocab_path='./data/vocab.pkl')
+loading annotations into memory...
+0:00:00.110551
+creating index...
+index created!
+----- DATA_LOADER -- loaded data ----
+---- USING GPU ---- 
+train_gru_lr.py:22: UserWarning: volatile was removed and now has no effect. Use `with torch.no_grad():` instead.
+  return Variable(x, volatile=volatile)
+train_gru_lr.py:100: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  loss.data[0], np.exp(loss.data[0]), time.time()-t0))
+Epoch [0/5], Step [0/1001], Loss: 9.2085, Perplexity: 9982.0498, Time: 0.4536
+Epoch [0/5], Step [500/1001], Loss: 3.3536, Perplexity: 28.6047, Time: 102.0690
+Epoch [0/5], Step [1000/1001], Loss: 3.1279, Perplexity: 22.8260, Time: 206.3640
+Epoch [1/5], Step [0/1001], Loss: 2.3288, Perplexity: 10.2656, Time: 206.8657
+Epoch [1/5], Step [500/1001], Loss: 2.6198, Perplexity: 13.7328, Time: 308.4798
+Epoch [1/5], Step [1000/1001], Loss: 2.6620, Perplexity: 14.3244, Time: 410.3308
+Epoch [2/5], Step [0/1001], Loss: 1.9384, Perplexity: 6.9479, Time: 410.8116
+Epoch [2/5], Step [500/1001], Loss: 2.5515, Perplexity: 12.8262, Time: 513.0431
+Epoch [2/5], Step [1000/1001], Loss: 2.2045, Perplexity: 9.0659, Time: 615.5190
+Epoch [3/5], Step [0/1001], Loss: 1.7717, Perplexity: 5.8806, Time: 616.1198
+Epoch [3/5], Step [500/1001], Loss: 2.2603, Perplexity: 9.5858, Time: 716.9269
+Epoch [3/5], Step [1000/1001], Loss: 2.0656, Perplexity: 7.8900, Time: 821.1022
+Epoch [4/5], Step [0/1001], Loss: 1.8883, Perplexity: 6.6082, Time: 821.6435
+Epoch [4/5], Step [500/1001], Loss: 1.9708, Perplexity: 7.1768, Time: 926.3201
+train_gru_lr.py:116: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
+Epoch [4/5], Step [1000/1001], Loss: 2.2062, Perplexity: 9.0809, Time: 1033.1438
+saving final model
+1000 - loss: 2.2062 - time: 1033.1460
+Namespace(batch_size=25, caption_path='./coco/annotations/sm_captions_train2014.json', crop_size=224, embed_size=128, hidden_size=256, image_dir='./data/resized2014', learning_rate=0.1, log_step=500, model_path='./models/GRU_LR', num_epochs=5, num_layers=1, num_workers=2, save_step=500, vocab_path='./data/vocab.pkl')
+loading annotations into memory...
+0:00:00.106755
+creating index...
+index created!
+----- DATA_LOADER -- loaded data ----
+---- USING GPU ---- 
+train_gru_lr.py:22: UserWarning: volatile was removed and now has no effect. Use `with torch.no_grad():` instead.
+  return Variable(x, volatile=volatile)
+train_gru_lr.py:100: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  loss.data[0], np.exp(loss.data[0]), time.time()-t0))
+Epoch [0/5], Step [0/1001], Loss: 9.2060, Perplexity: 9956.7695, Time: 0.4793
+Epoch [0/5], Step [500/1001], Loss: 11.6684, Perplexity: 116825.2109, Time: 103.2232
+Epoch [0/5], Step [1000/1001], Loss: 11.4867, Perplexity: 97408.0156, Time: 206.8204
+Epoch [1/5], Step [0/1001], Loss: 12.1175, Perplexity: 183044.5938, Time: 207.6575
+Epoch [1/5], Step [500/1001], Loss: 11.5877, Perplexity: 107765.4375, Time: 310.1646
+Epoch [1/5], Step [1000/1001], Loss: 13.4594, Perplexity: 700373.2500, Time: 414.8690
+Epoch [2/5], Step [0/1001], Loss: 12.2009, Perplexity: 198973.4688, Time: 415.9708
+Epoch [2/5], Step [500/1001], Loss: 14.3517, Perplexity: 1709504.5000, Time: 517.1382
+Epoch [2/5], Step [1000/1001], Loss: 15.5920, Perplexity: 5908974.5000, Time: 618.5377
+Epoch [3/5], Step [0/1001], Loss: 13.0248, Perplexity: 453521.2500, Time: 619.0177
+Epoch [3/5], Step [500/1001], Loss: 12.6444, Perplexity: 310008.4375, Time: 720.9541
+Epoch [3/5], Step [1000/1001], Loss: 14.8339, Perplexity: 2768635.5000, Time: 823.6025
+Epoch [4/5], Step [0/1001], Loss: 13.3324, Perplexity: 616871.2500, Time: 824.0715
+Epoch [4/5], Step [500/1001], Loss: 12.4420, Perplexity: 253213.4219, Time: 926.3014
+train_gru_lr.py:116: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
+Epoch [4/5], Step [1000/1001], Loss: 14.5805, Perplexity: 2148948.5000, Time: 1027.9687
+saving final model
+1000 - loss: 14.5805 - time: 1027.9712
+Namespace(batch_size=25, caption_path='./coco/annotations/sm_captions_train2014.json', crop_size=224, embed_size=128, hidden_size=256, image_dir='./data/resized2014', learning_rate=1.0, log_step=500, model_path='./models/GRU_LR', num_epochs=5, num_layers=1, num_workers=2, save_step=500, vocab_path='./data/vocab.pkl')
+loading annotations into memory...
+0:00:00.103214
+creating index...
+index created!
+----- DATA_LOADER -- loaded data ----
+---- USING GPU ---- 
+train_gru_lr.py:22: UserWarning: volatile was removed and now has no effect. Use `with torch.no_grad():` instead.
+  return Variable(x, volatile=volatile)
+train_gru_lr.py:100: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  loss.data[0], np.exp(loss.data[0]), time.time()-t0))
+Epoch [0/5], Step [0/1001], Loss: 9.2134, Perplexity: 10030.4219, Time: 0.4635
+train_gru_lr.py:100: RuntimeWarning: overflow encountered in exp
+  loss.data[0], np.exp(loss.data[0]), time.time()-t0))
+Epoch [0/5], Step [500/1001], Loss: 257.4284, Perplexity:   inf, Time: 103.5301
+Epoch [0/5], Step [1000/1001], Loss: 265.6548, Perplexity:   inf, Time: 207.0492
+Epoch [1/5], Step [0/1001], Loss: 263.7513, Perplexity:   inf, Time: 207.5649
+Epoch [1/5], Step [500/1001], Loss: 257.6745, Perplexity:   inf, Time: 310.7291
+Epoch [1/5], Step [1000/1001], Loss: 317.0463, Perplexity:   inf, Time: 417.7642
+Epoch [2/5], Step [0/1001], Loss: 221.9295, Perplexity:   inf, Time: 418.2639
+Epoch [2/5], Step [500/1001], Loss: 250.9196, Perplexity:   inf, Time: 521.6722
+Epoch [2/5], Step [1000/1001], Loss: 274.3037, Perplexity:   inf, Time: 624.3384
+Epoch [3/5], Step [0/1001], Loss: 240.7587, Perplexity:   inf, Time: 624.8357
+Epoch [3/5], Step [500/1001], Loss: 278.8205, Perplexity:   inf, Time: 727.2592
+Epoch [3/5], Step [1000/1001], Loss: 270.1243, Perplexity:   inf, Time: 832.5120
+Epoch [4/5], Step [0/1001], Loss: 285.8600, Perplexity:   inf, Time: 833.0011
+Epoch [4/5], Step [500/1001], Loss: 313.0047, Perplexity:   inf, Time: 936.4849
+train_gru_lr.py:116: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
+Epoch [4/5], Step [1000/1001], Loss: 356.2276, Perplexity:   inf, Time: 1038.9246
+saving final model
+1000 - loss: 356.2276 - time: 1038.9293
