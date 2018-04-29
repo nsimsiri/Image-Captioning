@@ -82,7 +82,7 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
         for xoder in ['decoder', 'encoder']:
             if (xoder in fn):
                 arg = '_'.join(fn.split('_')[:2])
-                arg2xoder[tuple(arg)][xoder] = fn;
+                arg2xoder[arg][xoder] = fn;
 
     # for each models
     EVAL_MAP = {};
@@ -92,7 +92,7 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
         GEN_CAPS = []
         cached_encoder = None;
         cached_decoder = None;
-
+        print arg
         print 'Evaluating model %s'%(arg);
         for img_id in imgIds:
 
