@@ -17,10 +17,10 @@ import json
 import copy;
 import pickle
 
-_IS_GRU = 1
+_IS_GRU = 0 #0 for LSTM 1 for GRU
 IS_GRU = (lambda: _IS_GRU == 1);
-GENCAP_DIR = './gen_caps/GRU_EXP_LR.pkl'
-XODER_PATH = './models/GRU_LR/'
+GENCAP_DIR = './gen_caps/LSTM_EXP_LR.pkl'
+XODER_PATH = './models/EXP2_LR/'
 dataDir='./coco'
 mypath = "./data/val_resized2014"
 # mypath = "./data/resized2014"
@@ -35,9 +35,7 @@ coco = COCO(annFile)
 imgIds = coco.getImgIds()
 print 'Annotations', len(coco.getAnnIds());
 print 'Imags', len(imgIds)
-'''
-ENCODER AND DECODER SWAPPED
-'''
+
 class Args(object):
     def __init__(self, img_file_name, folder='val2014',hardpath=None, enc=None, dec=None):
         img_location = './coco/%s/%s'%(folder,img_file_name);
