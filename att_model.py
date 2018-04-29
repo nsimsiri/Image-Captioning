@@ -50,11 +50,6 @@ class EncoderCNN(nn.Module):
         att_features = att_features.permute(0,2,1); # (N,L,D)
 
         features_proj = self._project_features(att_features);
-        # print 'features_proj', features_proj.shape;
-        # features = features.view(features.size(0), -1)
-        # print 'features2', features.shape
-        # proj_features = self.bn(self.linear(features))
-        # print 'features.shape', proj_features.shape
         return features_proj, att_features;
 
 
@@ -108,9 +103,9 @@ class DecoderRNN(nn.Module):
         self._affine_att.bias.data.fill_(0);
 
         #attention lstm decod sub-layers
-        torch.nn.init.xavier_uniform_(self._affine_decode_h)
-        torch.nn.init.xavier_uniform_(self._affine_decode_ctx)
-        torch.nn.init.xavier_uniform_(self._affine_decoder_out);
+        torch.nn.init.xavier_uniform_(self._affine_decode_h.weight)
+        torch.nn.init.xavier_uniform_(self._affine_decode_ctx.weight)
+        torch.nn.init.xavier_uniform_(self._affine_decoder_out.weight);
         self._affine_decode_h.bias.data.fill_(0);
         self._affine_decode_ctx.bias.data.fill_(0);
         self._affine_decoder_out.bias.data.fill_(0);
@@ -134,7 +129,6 @@ class DecoderRNN(nn.Module):
         h_out = self._affine_feat_proj_att(h);
         h_out = h_out.unsqueeze(1);
         relu_in = projected_features + h_out;
-        # print relu_in.shape;
         h_out = relu(relu_in); #(N, L, D)
         N, _ , _ = h_out.shape;
         # t = h time step, i = visual subsection
@@ -154,6 +148,8 @@ class DecoderRNN(nn.Module):
         h = (N, H)
         y_prev = (N, M)
         '''
+        self._affine_decode_h()
+
         pass
 
 
@@ -168,24 +164,19 @@ class DecoderRNN(nn.Module):
         embeddings = self.embed(captions) # = (N, M)
         next_c = Variable(torch.zeros(N, self.H))#.cuda() #need cuda
         next_h = self.affine_lstm_init(projected_features); # (N,H)
-        print 'embeddings', embeddings.shape
-        print 'next_c', next_c.shape;
-        print 'next_h', next_h.shape
         alphas = [];
         h_list = []
         for i in range(0,T):
             ctx_vector, alpha = self.attention_layer(next_h, projected_features, features);
-            print 'embedding_i', embeddings[:,i,:].shape
-            print 'ctx_vector', ctx_vector.shape;
+            # print 'embedding_i', embeddings[:,i,:].shape
+            # print 'ctx_vector', ctx_vector.shape;
             embedding_i = torch.cat((embeddings[:,i,:], ctx_vector), 1);
-            print 'embedding_i.shape', embedding_i.shape;
+            # print 'embedding_i.shape', embedding_i.shape;
 
             # expects input = (N, M), h,c = (N, H)
             next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));
-            print ("OK!!");
-            sys.exit()
-
             h_list.append(next_h);
+
         hiddens = torch.cat(h_list);
         outputs = self.linear(hiddens)
         return outputs;

@@ -77,10 +77,12 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
         cached_decoder = None;
         print arg
         print 'Evaluating model %s encoder=%s decoder=%s'%(arg, xoder2fn['encoder'], xoder2fn['decoder']);
+        i = 0;
         for img_id in imgIds:
 
-            print '--\nevaluating img: ', img_id
+            # print '--\nevaluating img: ', img_id
             try :
+                if (i%100==0): print '%s/%s'%(i,len(imgIds))
                 img = coco.loadImgs(img_id)[0] # index 0 because only 1 img return ie. coco.loadImgs.. = [img_we_want]
                 args = Args(img['file_name'], hardpath=('./data/val_resized2014' if dataType==VAL else './data/resized2014'), \
                             enc=xoder2fn['encoder'], dec=xoder2fn['decoder']);
@@ -95,7 +97,7 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
                 args.decoder = cached_decoder;
                 args.vocab = cached_vocab;
                 caption, cached_encoder, cached_decoder, cached_vocab = main(args, show_img=False);
-                print 'caption', caption;
+                # print 'caption', caption;
                 caption = caption.replace('<start>','').replace('<end>','')
                 caption_obj['caption'] = caption;
                 GEN_CAPS.append(caption_obj);
@@ -103,12 +105,13 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
                 print '\n-- error on img_id', img_id,'\n',e,'\n';
 
         EVAL_MAP[arg] = GEN_CAPS;
+        print 'Dumping EVAL_MAP json...';
+        with open(GENCAP_DIR, 'wb') as handle:
+            print 'writing to ', GENCAP_DIR;
+            pickle.dump(EVAL_MAP, handle)
+        print 'done';
 
-    print 'Dumping EVAL_MAP json...';
-    with open(GENCAP_DIR, 'wb') as handle:
-        print 'writing to ', GENCAP_DIR;
-        pickle.dump(EVAL_MAP, handle)
-    print 'done';
+
 
 
 
