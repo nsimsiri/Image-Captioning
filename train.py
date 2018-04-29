@@ -23,6 +23,9 @@ def to_var(x, volatile=False):
     return Variable(x, volatile=volatile)
 
 def name_pretrained_sizes(nl, emb, hid, xoder, epoch, i): return '%d_%d_%d_%s-%d-%d.pkl' %(nl, emb, hid, xoder, epoch+1, i+1)
+def name_pretrained_lr(lr_mag, xoder, epoch, i):
+    s = str(lr_mag).replace('.','');
+    return 'learning_%s_%s-%d-%d.pkl' %(s,xoder, epoch+1, i+1)
 
 def main(args):
     # Create model directory
@@ -113,12 +116,14 @@ def main(args):
     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
     torch.save(decoder.state_dict(),
                os.path.join(args.model_path,
+                            name_pretrained_lr(lr_mag, xoder, epoch, i)))
                             # name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "decoder", epoch, i)))
-                            'decoder-%d-%d.pkl' %(epoch+1, i+1)))
+                            # 'decoder-%d-%d.pkl' %(epoch+1, i+1)))
     torch.save(encoder.state_dict(),
                os.path.join(args.model_path,
+                            name_pretrained_lr(lr_mag, xoder, epoch, i)))
                             # name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "encoder", epoch, i)))
-                            'encoder-%d-%d.pkl' %(epoch+1, i+1)))
+                            # 'encoder-%d-%d.pkl' %(epoch+1, i+1)))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -147,7 +152,7 @@ if __name__ == '__main__':
                         help='number of layers in lstm')
 
     parser.add_argument('--num_epochs', type=int, default=5)
-    parser.add_argument('--batch_size', type=int, default=25) #128
+    parser.add_argument('--batch_size', type=int, default=5) #128
     parser.add_argument('--num_workers', type=int, default=2)
     parser.add_argument('--learning_rate', type=float, default=0.005)
     args = parser.parse_args()
