@@ -32,7 +32,10 @@ def main(args, show_img=True):
         from model_gru import EncoderCNN, DecoderRNN
         print DecoderRNN, EncoderCNN
         print '---USING GRU---'
-    else : print '--- USING LSTM ---'
+    else :
+        from model import EncoderCNN, DecoderRNN
+        print DecoderRNN, EncoderCNN
+        print '--- USING LSTM ---'
 
     transform = transforms.Compose([
         transforms.ToTensor(),
