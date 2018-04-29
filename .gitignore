@@ -1,5 +1,6 @@
 /models/baseline
 /models
 /models/baseline/*
+/output_slurm
 /.ipynb_checkpoints
 /gen_caps
