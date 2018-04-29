@@ -27,7 +27,7 @@ def load_image(image_path, transform=None):
 
 def main(args, show_img=True):
     # Image preprocessing
-    if (arg.use_gru == 1):
+    if (args.use_gru == 1):
         from model_gru import EncoderCNN, DecoderRNN
         print DecoderRNN
         print '---USING GRU---'
