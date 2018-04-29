@@ -31,10 +31,10 @@ dataType='val2014'
 # dataType='train2014'
 annFile='{}/annotations/sm_captions_{}.json'.format(dataDir,dataType)
 print 'running eval_script_lr on caption=%s xoder=%s dataType=%s annFile=%s'%(GENCAP_DIR, XODER_PATH, dataType, annFile)
-coco = COCO(annFile)
-imgIds = coco.getImgIds()
-print 'Annotations', len(coco.getAnnIds());
-print 'Imags', len(imgIds)
+# coco = COCO(annFile)
+# imgIds = coco.getImgIds()
+# print 'Annotations', len(coco.getAnnIds());
+# print 'Imags', len(imgIds)
 
 class Args(object):
     def __init__(self, img_file_name, folder='val2014',hardpath=None, enc=None, dec=None):
@@ -46,8 +46,8 @@ class Args(object):
         self.encoder_path = XODER_PATH + enc#'./models/1_256_512_encoder-5-1001.pkl'
         self.decoder_path = XODER_PATH + dec#'./models/1_256_512_decoder-5-1001.pkl'
         self.vocab_path = './data/vocab.pkl'
-        self.embed_size = 256
-        self.hidden_size = 512;
+        self.embed_size = 128 if IS_GRU() else 256;
+        self.hidden_size = 256 if IS_GRU() else 512;
         self.num_layers = 1;
         self.image = img_location;
         self.encoder = None;
@@ -59,17 +59,30 @@ class Args(object):
                 'GRU' if IS_GRU() else 'LSTM', self.image, self.encoder_path, \
                 self.decoder_path, self.embed_size, self.hidden_size, self.num_layers);
 
-
-
-for (dirpath, dirnames, filenames) in walk(mypath):
-    pass;
+# arg2xoder = defaultdict(dict);
+# stub = ['learning_00001_decoder-5-1001.pkl', 'learning_0001_encoder-5-1001.pkl','learning_01_decoder-5-1001.pkl','learning_10_encoder-5-1001.pkl',
+# 'learning_00001_encoder-5-1001.pkl',  'learning_001_decoder-5-1001.pkl',   'learning_01_encoder-5-1001.pkl',  'learning_1e-05_decoder-5-1001.pkl',
+# 'learning_0001_decoder-5-1001.pkl',   'learning_001_encoder-5-1001.pkl',   'learning_10_decoder-5-1001.pkl',  'learning_1e-05_encoder-5-1001.pkl']
+# for fn in stub:
+#     for xoder in ['decoder', 'encoder']:
+#         if (xoder in fn):
+#             arg = '_'.join(fn.split('_')[:2]);
+#             # if 'e' not in arg:
+#             #     l = list(arg)
+#             #     l.insert(1,'.')
+#             #     arg = ''.join(l);
+#             print arg;
+#             arg2xoder[tuple(arg)][xoder] = fn;
+#
+# sys.exit()
 
 for (dirpath, dirnames, filenames) in walk(XODER_PATH):
     arg2xoder = defaultdict(dict);
     for fn in filenames:
         for xoder in ['decoder', 'encoder']:
             if (xoder in fn):
-                arg = filter(lambda x: len(x.strip())!=0, fn.split(xoder)[0].split("_"))
+                arg = filter(lambda x: len(x.strip())!=0, fn.split('_')[0])[0];
+                print arg
                 arg2xoder[tuple(arg)][xoder] = fn;
 
     # for each models
@@ -77,9 +90,6 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
     cached_vocab = None;
     for arg, xoder2fn in arg2xoder.iteritems():
         print '-------';
-        num_layers = arg[0]
-        embed_size = arg[1];
-        hidden_size = arg[2];
         GEN_CAPS = []
         cached_encoder = None;
         cached_decoder = None;
