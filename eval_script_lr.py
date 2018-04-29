@@ -81,8 +81,7 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
     for fn in filenames:
         for xoder in ['decoder', 'encoder']:
             if (xoder in fn):
-                arg = filter(lambda x: len(x.strip())!=0, fn.split('_')[0])[0];
-                print arg
+                arg = '_'.join(fn.split('_')[:2])
                 arg2xoder[tuple(arg)][xoder] = fn;
 
     # for each models
@@ -94,7 +93,7 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
         cached_encoder = None;
         cached_decoder = None;
 
-        print 'Evaluating model - nlayer:% s emb:%s hid:%s'%(num_layers, embed_size, hidden_size);
+        print 'Evaluating model %s'%(arg);
         for img_id in imgIds:
 
             print '--\nevaluating img: ', img_id
@@ -102,18 +101,13 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
                 img = coco.loadImgs(img_id)[0] # index 0 because only 1 img return ie. coco.loadImgs.. = [img_we_want]
                 args = Args(img['file_name'], hardpath=('./data/val_resized2014' if dataType==VAL else './data/resized2014'), \
                             enc=xoder2fn['encoder'], dec=xoder2fn['decoder']);
-                args.num_layers = int(num_layers);
-                args.embed_size = int(embed_size);
-                args.hidden_size = int(hidden_size);
                 coco.dataset['type'] = None; # to fix bug with diff versio.
                 annIds = coco.getAnnIds(imgIds=[img['id']])
                 ann = coco.loadAnns(annIds)
                 gold = [x['caption'] for x in ann]
                 caption_obj = copy.copy(ann[0]);
                 caption_obj['file_name'] = str(args.image); #file name'
-                # print '\n------TRUE CAPTIONS------';
-                # for sen in gold:
-                #     print sen
+
                 args.encoder = cached_encoder;
                 args.decoder = cached_decoder;
                 args.vocab = cached_vocab;
@@ -121,8 +115,6 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
                 print 'caption', caption;
                 caption = caption.replace('<start>','').replace('<end>','')
                 caption_obj['caption'] = caption;
-                # img['caption'] = caption;
-                # gen_captions.append({'caption': caption, 'image_id': img_id});
                 GEN_CAPS.append(caption_obj);
             except Exception as e:
                 print '\n-- error on img_id', img_id,'\n',e,'\n';
