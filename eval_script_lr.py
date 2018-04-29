@@ -17,7 +17,7 @@ import json
 import copy;
 import pickle
 
-_IS_GRU =  0 #0 for LSTM 1 for GRU
+_IS_GRU = 0 #0 for LSTM 1 for GRU
 IS_GRU = (lambda: _IS_GRU == 1);
 GENCAP_DIR = './gen_caps/LSTM_EXP_LR.pkl'
 XODER_PATH = './models/EXP2_LR/'
