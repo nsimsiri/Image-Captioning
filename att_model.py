@@ -110,9 +110,13 @@ class DecoderRNN(nn.Module):
         h = relu(h);
         return h;
 
-    def attention_layer(self, h, projected_features, features):
+    def attention_layer(self, h, projected_features, annotation_vector):
+        """ Attention mechanism from show,attend,tell - equation 4,5,6 and
+            section 4 for soft-attention.
+            returns: context_vector = (N, D), alpha (N, L)
+        """
         relu = nn.ReLU();
-        softmax = nn.Softmax();
+        softmax = nn.Softmax(dim=1); #input = (N, L)
 
         h_out = self._affine_feat_proj_att(h);
         h_out = h_out.unsqueeze(1);
@@ -120,13 +124,18 @@ class DecoderRNN(nn.Module):
         # print relu_in.shape;
         h_out = relu(relu_in); #(N, L, D)
         N, _ , _ = h_out.shape;
-        print 'N', N;
-        e_it = self._affine_att(h_out.contiguous().view(N * self.L, self.D)); # (N*L, D) x (D, 1)
-        e_it = e_it.contiguous().view(N, self.L);
-        alpha = softmax(att_out);
-        print 'att_out', att_out.shape;
-        return None;
+        # t = h time step, i = visual subsection
+        # each i in L is an attention factor;
+        e_ti = self._affine_att(h_out.contiguous().view(N * self.L, self.D)); # (N*L, D) x (D, 1)
+        e_ti = e_ti.contiguous().view(N, self.L);
+        alpha = softmax(e_ti);
+        # 4.1.13 sum(L) { annotation_vec * }
+        # apply attention weights to each region
+        _weighted_anns = alpha.unsqueeze(2)*annotation_vector;
+        ctx_vector = torch.sum(_weighted_anns, 2);
+        return ctx_vector, alpha;
 
+    # def attention_lstm_layer(self, )
 
     # projected_features (N,L,D), features (N,L,D),
     def forward(self, projected_features, features, captions, lengths):
@@ -143,12 +152,13 @@ class DecoderRNN(nn.Module):
         print 'next_h', next_h.shape
         alphas = [];
         h_list = []
-        self.attention_layer(next_h, projected_features, features);
-        print ("OK!!");
-        sys.exit()
+        ctx_vector, alpha = self.attention_layer(next_h, projected_features, features);
+
         for i in range(0,T):
             # expects input = (N, M), h,c = (N, H)
             next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));
+            print ("OK!!");
+            sys.exit()
             h_list.append(next_h);
         hiddens = torch.cat(h_list);
         outputs = self.linear(hiddens)
