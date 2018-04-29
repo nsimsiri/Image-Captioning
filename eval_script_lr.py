@@ -31,10 +31,10 @@ dataType='val2014'
 # dataType='train2014'
 annFile='{}/annotations/sm_captions_{}.json'.format(dataDir,dataType)
 print 'running eval_script_lr on caption=%s xoder=%s dataType=%s annFile=%s'%(GENCAP_DIR, XODER_PATH, dataType, annFile)
-# coco = COCO(annFile)
-# imgIds = coco.getImgIds()
-# print 'Annotations', len(coco.getAnnIds());
-# print 'Imags', len(imgIds)
+coco = COCO(annFile)
+imgIds = coco.getImgIds()
+print 'Annotations', len(coco.getAnnIds());
+print 'Imags', len(imgIds)
 
 class Args(object):
     def __init__(self, img_file_name, folder='val2014',hardpath=None, enc=None, dec=None):
