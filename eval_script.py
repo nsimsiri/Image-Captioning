@@ -19,7 +19,7 @@ import pickle
 
 _IS_GRU = 1
 IS_GRU = (lambda: _IS_GRU == 1);
-GENCAP_DIR = './gen_caps/GRU_EXP.pkl'
+GENCAP_DIR = './gen_caps/GRU_EXP_FIX.pkl'
 XODER_PATH = './models/'
 dataDir='./coco'
 mypath = "./data/val_resized2014"
