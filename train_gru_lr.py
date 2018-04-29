@@ -116,12 +116,12 @@ def main(args):
     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
     torch.save(decoder.state_dict(),
                os.path.join(args.model_path,
-                            name_pretrained_lr(args.learning_rate, "encoder", epoch, i)))
+                            name_pretrained_lr(args.learning_rate, "decoder", epoch, i)))
                             # name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "decoder", epoch, i)))
                             # 'decoder-%d-%d.pkl' %(epoch+1, i+1)))
     torch.save(encoder.state_dict(),
                os.path.join(args.model_path,
-                            name_pretrained_lr(args.learning_rate, "decoder", epoch, i)))
+                            name_pretrained_lr(args.learning_rate, "encoder", epoch, i)))
                             # name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "encoder", epoch, i)))
                             # 'encoder-%d-%d.pkl' %(epoch+1, i+1)))
 

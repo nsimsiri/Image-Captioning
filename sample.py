@@ -30,7 +30,7 @@ def main(args, show_img=True):
     print args
     if (args.use_gru == 1):
         from model_gru import EncoderCNN, DecoderRNN
-        print DecoderRNN
+        print DecoderRNN, EncoderCNN
         print '---USING GRU---'
     else : print '--- USING LSTM ---'
 

@@ -35,7 +35,9 @@ coco = COCO(annFile)
 imgIds = coco.getImgIds()
 print 'Annotations', len(coco.getAnnIds());
 print 'Imags', len(imgIds)
-
+'''
+ENCODER AND DECODER SWAPPED
+'''
 class Args(object):
     def __init__(self, img_file_name, folder='val2014',hardpath=None, enc=None, dec=None):
         img_location = './coco/%s/%s'%(folder,img_file_name);
@@ -59,23 +61,6 @@ class Args(object):
                 'GRU' if IS_GRU() else 'LSTM', self.image, self.encoder_path, \
                 self.decoder_path, self.embed_size, self.hidden_size, self.num_layers);
 
-# arg2xoder = defaultdict(dict);
-# stub = ['learning_00001_decoder-5-1001.pkl', 'learning_0001_encoder-5-1001.pkl','learning_01_decoder-5-1001.pkl','learning_10_encoder-5-1001.pkl',
-# 'learning_00001_encoder-5-1001.pkl',  'learning_001_decoder-5-1001.pkl',   'learning_01_encoder-5-1001.pkl',  'learning_1e-05_decoder-5-1001.pkl',
-# 'learning_0001_decoder-5-1001.pkl',   'learning_001_encoder-5-1001.pkl',   'learning_10_decoder-5-1001.pkl',  'learning_1e-05_encoder-5-1001.pkl']
-# for fn in stub:
-#     for xoder in ['decoder', 'encoder']:
-#         if (xoder in fn):
-#             arg = '_'.join(fn.split('_')[:2]);
-#             # if 'e' not in arg:
-#             #     l = list(arg)
-#             #     l.insert(1,'.')
-#             #     arg = ''.join(l);
-#             print arg;
-#             arg2xoder[tuple(arg)][xoder] = fn;
-#
-# sys.exit()
-
 for (dirpath, dirnames, filenames) in walk(XODER_PATH):
     arg2xoder = defaultdict(dict);
     for fn in filenames:
@@ -93,40 +78,43 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
         cached_encoder = None;
         cached_decoder = None;
         print arg
-        print 'Evaluating model %s'%(arg);
+        print 'Evaluating model %s encoder=%s decoder=%s'%(arg, xoder2fn['encoder'], xoder2fn['decoder']);
         for img_id in imgIds:
 
             print '--\nevaluating img: ', img_id
-            # try :
-            img = coco.loadImgs(img_id)[0] # index 0 because only 1 img return ie. coco.loadImgs.. = [img_we_want]
-            args = Args(img['file_name'], hardpath=('./data/val_resized2014' if dataType==VAL else './data/resized2014'), \
-                        enc=xoder2fn['encoder'], dec=xoder2fn['decoder']);
-            coco.dataset['type'] = None; # to fix bug with diff versio.
-            annIds = coco.getAnnIds(imgIds=[img['id']])
-            ann = coco.loadAnns(annIds)
-            gold = [x['caption'] for x in ann]
-            caption_obj = copy.copy(ann[0]);
-            caption_obj['file_name'] = str(args.image); #file name'
+            try :
+                img = coco.loadImgs(img_id)[0] # index 0 because only 1 img return ie. coco.loadImgs.. = [img_we_want]
+                args = Args(img['file_name'], hardpath=('./data/val_resized2014' if dataType==VAL else './data/resized2014'), \
+                            enc=xoder2fn['encoder'], dec=xoder2fn['decoder']);
+                coco.dataset['type'] = None; # to fix bug with diff versio.
+                annIds = coco.getAnnIds(imgIds=[img['id']])
+                ann = coco.loadAnns(annIds)
+                gold = [x['caption'] for x in ann]
+                caption_obj = copy.copy(ann[0]);
+                caption_obj['file_name'] = str(args.image); #file name'
 
-            args.encoder = cached_encoder;
-            args.decoder = cached_decoder;
-            args.vocab = cached_vocab;
-            caption, cached_encoder, cached_decoder, cached_vocab = main(args, show_img=False);
-            print 'caption', caption;
-            caption = caption.replace('<start>','').replace('<end>','')
-            caption_obj['caption'] = caption;
-            GEN_CAPS.append(caption_obj);
-            # except Exception as e:
-            #     print '\n-- error on img_id', img_id,'\n',e,'\n';
+                args.encoder = cached_encoder;
+                args.decoder = cached_decoder;
+                args.vocab = cached_vocab;
+                caption, cached_encoder, cached_decoder, cached_vocab = main(args, show_img=False);
+                print 'caption', caption;
+                caption = caption.replace('<start>','').replace('<end>','')
+                caption_obj['caption'] = caption;
+                GEN_CAPS.append(caption_obj);
+            except Exception as e:
+                print '\n-- error on img_id', img_id,'\n',e,'\n';
 
         EVAL_MAP[arg] = GEN_CAPS;
-        break;
 
     print 'Dumping EVAL_MAP json...';
     with open(GENCAP_DIR, 'wb') as handle:
         print 'writing to ', GENCAP_DIR;
         pickle.dump(EVAL_MAP, handle)
     print 'done';
+
+
+
+    ''' DEBUG'''
 # caption generator
 # a_time = time.time()
 # print '--results--\n'
@@ -135,3 +123,20 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
 # caption = caption.replace('<start>','').replace('end>','')
 # print time.time()-  a_time
 # print caption;
+
+# arg2xoder = defaultdict(dict);
+# stub = ['learning_00001_decoder-5-1001.pkl', 'learning_0001_encoder-5-1001.pkl','learning_01_decoder-5-1001.pkl','learning_10_encoder-5-1001.pkl',
+# 'learning_00001_encoder-5-1001.pkl',  'learning_001_decoder-5-1001.pkl',   'learning_01_encoder-5-1001.pkl',  'learning_1e-05_decoder-5-1001.pkl',
+# 'learning_0001_decoder-5-1001.pkl',   'learning_001_encoder-5-1001.pkl',   'learning_10_decoder-5-1001.pkl',  'learning_1e-05_encoder-5-1001.pkl']
+# for fn in stub:
+#     for xoder in ['decoder', 'encoder']:
+#         if (xoder in fn):
+#             arg = '_'.join(fn.split('_')[:2]);
+#             # if 'e' not in arg:
+#             #     l = list(arg)
+#             #     l.insert(1,'.')
+#             #     arg = ''.join(l);
+#             print arg;
+#             arg2xoder[tuple(arg)][xoder] = fn;
+#
+# sys.exit()
