@@ -22,6 +22,10 @@ def to_var(x, volatile=False):
     return Variable(x, volatile=volatile)
 
 def name_pretrained_sizes(nl, emb, hid, xoder, epoch, i): return '%d_%d_%d_%s-%d-%d.pkl' %(nl, emb, hid, xoder, epoch+1, i+1)
+def name_pretrained_lr(lr_mag, xoder, epoch, i):
+    s = str(lr_mag).replace('.','');
+    return 'learning_%s_%s-%d-%d.pkl' %(s,xoder, epoch+1, i+1)
+
 
 def main(args):
     # Create model directory
@@ -112,11 +116,13 @@ def main(args):
     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
     torch.save(decoder.state_dict(),
                os.path.join(args.model_path,
-                            name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "decoder", epoch, i)))
+                            name_pretrained_lr(args.learning_rate, "encoder", epoch, i)))
+                            # name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "decoder", epoch, i)))
                             # 'decoder-%d-%d.pkl' %(epoch+1, i+1)))
     torch.save(encoder.state_dict(),
                os.path.join(args.model_path,
-                            name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "encoder", epoch, i)))
+                            name_pretrained_lr(args.learning_rate, "decoder", epoch, i)))
+                            # name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "encoder", epoch, i)))
                             # 'encoder-%d-%d.pkl' %(epoch+1, i+1)))
 
 if __name__ == '__main__':
