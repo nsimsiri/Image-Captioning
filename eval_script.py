@@ -53,7 +53,7 @@ class Args(object):
         self.encoder = None;
         self.decoder = None;
         self.vocab = None;
-        self.use_gru = IS_GRU;
+        self.use_gru = _IS_GRU;
     def __str__(self):
         return 'Arg[%s img_loc=%s, enc=%s, dec=%s, emb=%s, hid=%s, nlayer=%s]'%(\
                 'GRU' if IS_GRU() else 'LSTM', self.image, self.encoder_path, \
