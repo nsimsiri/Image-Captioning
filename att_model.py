@@ -59,9 +59,10 @@ class EncoderCNN(nn.Module):
 
 
 class DecoderRNN(nn.Module):
-    def __init__(self, embed_size,hidden_size, vocab_size, num_layers ):
+    def __init__(self, embed_size,hidden_size, vocab_size, num_layers, batch_size):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
+        self.N = batch_size;
         self.V = vocab_size
         self.M = embed_size
         self.H =  hidden_size
@@ -78,7 +79,11 @@ class DecoderRNN(nn.Module):
         self._affine_feat_proj_att = nn.Linear(self.H, self.D);
         self._affine_att = nn.Linear(self.D, 1);
         # LSTM cell
-        self.lstm_cell = nn.LSTMCell(self.M, self.H);
+        self.lstm_cell = nn.LSTMCell(self.M + self.D, self.H);
+        # attention lstm decode sub-layers; - Equation(7)
+        self._affine_decode_h = nn.Linear(self.H, self.M);
+        self._affine_decode_ctx = nn.Linear(self.D, self.M);
+        self._affine_decoder_out = nn.Linear(self.M, self.V);
 
         self.init_weights();
         self.hidden_size = hidden_size;
@@ -101,6 +106,14 @@ class DecoderRNN(nn.Module):
         torch.nn.init.xavier_uniform_(self._affine_att.weight);
         self._affine_feat_proj_att.bias.data.fill_(0);
         self._affine_att.bias.data.fill_(0);
+
+        #attention lstm decod sub-layers
+        torch.nn.init.xavier_uniform_(self._affine_decode_h)
+        torch.nn.init.xavier_uniform_(self._affine_decode_ctx)
+        torch.nn.init.xavier_uniform_(self._affine_decoder_out);
+        self._affine_decode_h.bias.data.fill_(0);
+        self._affine_decode_ctx.bias.data.fill_(0);
+        self._affine_decoder_out.bias.data.fill_(0);
 
     #(N, L, D) features
     def affine_lstm_init(self, features):
@@ -132,10 +145,17 @@ class DecoderRNN(nn.Module):
         # 4.1.13 sum(L) { annotation_vec * }
         # apply attention weights to each region
         _weighted_anns = alpha.unsqueeze(2)*annotation_vector;
-        ctx_vector = torch.sum(_weighted_anns, 2);
+        ctx_vector = torch.sum(_weighted_anns, 1);
         return ctx_vector, alpha;
 
-    # def attention_lstm_layer(self, )
+    def attention_lstm_decode_layer(self, ctx_vector, h, y_prev):
+        '''
+        ctx_vector = (N, D)
+        h = (N, H)
+        y_prev = (N, M)
+        '''
+        pass
+
 
     # projected_features (N,L,D), features (N,L,D),
     def forward(self, projected_features, features, captions, lengths):
@@ -144,6 +164,7 @@ class DecoderRNN(nn.Module):
             features = (N, L, D) i.e (N, 49, 2048)
         """
         N, T = captions.shape;
+
         embeddings = self.embed(captions) # = (N, M)
         next_c = Variable(torch.zeros(N, self.H))#.cuda() #need cuda
         next_h = self.affine_lstm_init(projected_features); # (N,H)
@@ -152,13 +173,18 @@ class DecoderRNN(nn.Module):
         print 'next_h', next_h.shape
         alphas = [];
         h_list = []
-        ctx_vector, alpha = self.attention_layer(next_h, projected_features, features);
-
         for i in range(0,T):
+            ctx_vector, alpha = self.attention_layer(next_h, projected_features, features);
+            print 'embedding_i', embeddings[:,i,:].shape
+            print 'ctx_vector', ctx_vector.shape;
+            embedding_i = torch.cat((embeddings[:,i,:], ctx_vector), 1);
+            print 'embedding_i.shape', embedding_i.shape;
+
             # expects input = (N, M), h,c = (N, H)
-            next_h, next_c = self.lstm_cell(embeddings[:,i,:], (next_h, next_c));
+            next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));
             print ("OK!!");
             sys.exit()
+
             h_list.append(next_h);
         hiddens = torch.cat(h_list);
         outputs = self.linear(hiddens)

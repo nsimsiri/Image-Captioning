@@ -1,4 +1,4 @@
-__author__ = 'tylin'
+__author__ = 'natcha'
 from tokenizer.ptbtokenizer import PTBTokenizer
 from bleu.bleu import Bleu
 from meteor.meteor import Meteor

@@ -17,7 +17,9 @@ import json
 import copy;
 import pickle
 
-GENCAP_DIR = './gen_caps/LSTM_EXP2.pkl'
+_IS_GRU = 1
+IS_GRU = (lambda: _IS_GRU == 1);
+GENCAP_DIR = './gen_caps/GRU_EXP.pkl'
 XODER_PATH = './models/'
 dataDir='./coco'
 mypath = "./data/val_resized2014"
@@ -51,11 +53,11 @@ class Args(object):
         self.encoder = None;
         self.decoder = None;
         self.vocab = None;
+        self.use_gru = IS_GRU;
     def __str__(self):
-        return 'Arg[img_loc=%s, enc=%s, dec=%s, emb=%s, hid=%s, nlayer=%s]'%(self.image, self.encoder_path, \
+        return 'Arg[%s img_loc=%s, enc=%s, dec=%s, emb=%s, hid=%s, nlayer=%s]'%(\
+                'GRU' if IS_GRU() else 'LSTM', self.image, self.encoder_path, \
                 self.decoder_path, self.embed_size, self.hidden_size, self.num_layers);
-
-
 
 for (dirpath, dirnames, filenames) in walk(mypath):
     pass;
@@ -120,11 +122,3 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
         print 'writing to ', GENCAP_DIR;
         pickle.dump(EVAL_MAP, handle)
     print 'done';
-# caption generator
-# a_time = time.time()
-# print '--results--\n'
-# caption, encoder, decoder, vocab = main(args, show_img=False)
-# print caption
-# caption = caption.replace('<start>','').replace('end>','')
-# print time.time()-  a_time
-# print caption;

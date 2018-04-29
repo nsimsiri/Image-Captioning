@@ -8,8 +8,8 @@ from torch.autograd import Variable
 from torchvision import transforms
 from build_vocab import Vocabulary
 from model import EncoderCNN, DecoderRNN
-from PIL import Image
 
+from PIL import Image
 
 def to_var(x, volatile=False):
     if torch.cuda.is_available():
@@ -27,7 +27,11 @@ def load_image(image_path, transform=None):
 
 def main(args, show_img=True):
     # Image preprocessing
-    print args;
+    if (arg.use_gru == 1):
+        from model_gru import EncoderCNN, DecoderRNN
+        print DecoderRNN
+        print '---USING GRU---'
+
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.485, 0.456, 0.406),
@@ -84,6 +88,8 @@ def main(args, show_img=True):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('--gru', type=int , default=0 ,
+                        help='using gru')
     parser.add_argument('--image', type=str, required=True,
                         help='input image for generating caption')
     parser.add_argument('--encoder_path', type=str, default='./models/encoder-5-3000.pkl',
@@ -100,6 +106,7 @@ if __name__ == '__main__':
                         help='dimension of lstm hidden states')
     parser.add_argument('--num_layers', type=int , default=1 ,
                         help='number of layers in lstm')
+
     args = parser.parse_args()
     print args
     main(args)
