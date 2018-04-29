@@ -17,9 +17,10 @@ import json
 import copy;
 import pickle
 
-
-GENCAP_DIR = './gen_caps/LSTM_EXP2_LR.pkl'
-XODER_PATH = './models/EXP2/'
+_IS_GRU = 1
+IS_GRU = (lambda: _IS_GRU == 1);
+GENCAP_DIR = './gen_caps/GRU_EXP_LR.pkl'
+XODER_PATH = './models/GRU_LR/'
 dataDir='./coco'
 mypath = "./data/val_resized2014"
 # mypath = "./data/resized2014"
@@ -52,8 +53,10 @@ class Args(object):
         self.encoder = None;
         self.decoder = None;
         self.vocab = None;
+        self.use_gru = _IS_GRU;
     def __str__(self):
-        return 'Arg[img_loc=%s, enc=%s, dec=%s, emb=%s, hid=%s, nlayer=%s]'%(self.image, self.encoder_path, \
+        return 'Arg[%s img_loc=%s, enc=%s, dec=%s, emb=%s, hid=%s, nlayer=%s]'%(\
+                'GRU' if IS_GRU() else 'LSTM', self.image, self.encoder_path, \
                 self.decoder_path, self.embed_size, self.hidden_size, self.num_layers);
 
 
@@ -112,7 +115,7 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
                 # gen_captions.append({'caption': caption, 'image_id': img_id});
                 GEN_CAPS.append(caption_obj);
             except Exception as e:
-                print '\n-- erorr on img_id', img_id,'\n',e,'\n';
+                print '\n-- error on img_id', img_id,'\n',e,'\n';
 
         EVAL_MAP[arg] = GEN_CAPS;
         break;
