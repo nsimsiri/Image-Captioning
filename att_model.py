@@ -49,7 +49,7 @@ class EncoderCNN(nn.Module):
     def forward(self, images):
         """Extract the image feature vectors."""
         features = self.resnet(images)
-        features = Variable(features.data) #(N, D, L', L') where L' = sqrt(L)
+        features = to_var(Variable(features.data)) #(N, D, L', L') where L' = sqrt(L)
         features = self.bn2D(features); # (N, D, L', L')
 
         att_features = features.view((features.shape[0], RESNET_SHAPE[0], \
@@ -207,9 +207,9 @@ class DecoderRNN(nn.Module):
         N = features.shape[0];
         next_h, next_c = self.affine_lstm_init(features); # (N,H)
         sampled_ids = []
-        start = torch.LongTensor([1]*N);
+        start = torch.cuda.LongTensor([1]*N).cuda();
         embeddings = self.embed(start);
-        y_i = Variable(torch.zeros(N, self.V));
+        y_i = to_var(Variable(torch.zeros(N, self.V)));
         for i in range(20):                                      # maximum sampling length
             alphas = [];
             h_list = []
