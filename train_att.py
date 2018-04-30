@@ -98,14 +98,13 @@ def main(args):
                 print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
                       %(epoch, args.num_epochs, i, total_step,
                         loss.data[0], np.exp(loss.data[0]), time.time()-t0))
-            else:
-                print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
+            # else:
+            #     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
 
             # Save the models
             # if (i+1) % args.save_step == 0:
                 #pass
-            break;
-        break;
+                
     print 'saving final model';
     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
     torch.save(decoder.state_dict(),

@@ -185,7 +185,7 @@ class DecoderRNN(nn.Module):
 
         alphas = [];
         h_list = []
-        y_i = Variable(torch.zeros(N, self.V));
+        y_i = to_var(Variable(torch.zeros(N, self.V)));
         for i in range(0,T):
             ctx_vector, alpha = self.attention_layer(next_h, projected_features, features);
             embedding_i = torch.cat((embeddings[:,i,:], ctx_vector), 1);
