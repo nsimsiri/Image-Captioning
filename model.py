@@ -5,10 +5,10 @@ from torch.nn.utils.rnn import pack_padded_sequence
 from torch.autograd import Variable
 
 
-class OEncoderCNN(nn.Module):
+class EncoderCNN(nn.Module):
     def __init__(self, embed_size):
         """Load the pretrained ResNet-152 and replace top fc layer."""
-        super(OEncoderCNN, self).__init__()
+        super(EncoderCNN, self).__init__()
         resnet = models.resnet152(pretrained=True)
         modules = list(resnet.children())[:-1]      # delete the last fc layer.
         self.resnet = nn.Sequential(*modules)
@@ -30,10 +30,10 @@ class OEncoderCNN(nn.Module):
         return features
 
 
-class ODecoderRNN(nn.Module):
+class DecoderRNN(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers):
         """Set the hyper-parameters and build the layers."""
-        super(ODecoderRNN, self).__init__()
+        super(DecoderRNN, self).__init__()
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
@@ -50,7 +50,6 @@ class ODecoderRNN(nn.Module):
         embeddings = self.embed(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
-        print 'packed', packed;
         hiddens, _ = self.lstm(packed)
         outputs = self.linear(hiddens[0])
         return outputs

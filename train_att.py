@@ -8,7 +8,6 @@ from data_loader import get_loader
 from data_loader import get_loader_coco
 from build_vocab import Vocabulary
 from att_model import EncoderCNN, DecoderRNN
-from model import OEncoderCNN, ODecoderRNN
 from torch.autograd import Variable
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
@@ -83,7 +82,7 @@ def main(args):
             projected_features, features = encoder(images)
             outputs = decoder(projected_features, features, captions, lengths)
 
-            lengths = torch.cuda.LongTensor(lengths);
+            # lengths = torch.cuda.LongTensor(lengths);
             # loss = compute_loss(outputs, captions, lengths) #targets
             # loss.backward()
             # optimizer.step()
@@ -103,7 +102,7 @@ def main(args):
             print sentence
             sys.exit()
             '''
-            print i;
+            print i
             # if i % args.log_step == 0:
             #     print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
             #           %(epoch, args.num_epochs, i, total_step,
