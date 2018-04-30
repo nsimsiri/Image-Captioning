@@ -104,6 +104,8 @@ def main(args):
             # Save the models
             # if (i+1) % args.save_step == 0:
                 #pass
+            break;
+        break;
     print 'saving final model';
     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
     torch.save(decoder.state_dict(),
@@ -130,7 +132,7 @@ if __name__ == '__main__':
                         help='path for train annotation json file')
     parser.add_argument('--log_step', type=int , default=100,
                         help='step size for prining log info')
-    parser.add_argument('--save_step', type=int , default=500,
+    parser.add_argument('--save_step', type=int , default=10,
                         help='step size for saving trained models')
 
     # Model parameters

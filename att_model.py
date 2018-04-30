@@ -223,11 +223,8 @@ class DecoderRNN(nn.Module):
             sampled_ids.append(word_idx)
             alphas.append(alpha);
             embeddings = self.embed(word_idx);
-        print sampled_ids
         sampled_ids = torch.cat(sampled_ids, 0);
-        print 'sampled_ids', sampled_ids.shape;
         sampled_ids = sampled_ids.squeeze()
-        print 'sampled_ids.sqe', sampled_ids.shape;
         return sampled_ids;
 
 
