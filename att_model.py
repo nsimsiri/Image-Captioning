@@ -229,7 +229,7 @@ class DecoderRNN(nn.Module):
 
         outputs = torch.cat(h_list) ;
         outputs = self.linear(outputs);
-        # outputs = outputs.contiguous().view((N, T, self.V));
+        outputs = outputs.contiguous().view((N, T, self.V));
         # print 'outputs',outputs.shape;
         return outputs;
 

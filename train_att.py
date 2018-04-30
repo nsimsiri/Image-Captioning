@@ -80,11 +80,10 @@ def main(args):
             projected_features, features = encoder(images)
             outputs = decoder(projected_features, features, captions, lengths)
 
-            # lengths = torch.cuda.LongTensor(lengths);
-            # loss = compute_loss(outputs, captions, lengths) #targets
-            # loss.backward()
-            # optimizer.step()
-            loss = 3.22;
+            lengths = torch.cuda.LongTensor(lengths);
+            loss = compute_loss(outputs, captions, lengths) #targets
+            loss.backward()
+            optimizer.step()
             # Print log info
             '''
             projected_features, features = encoder(images[0].unsqueeze(0));
@@ -100,11 +99,11 @@ def main(args):
             print sentence
             sys.exit()
             '''
-            print i
-            # if i % args.log_step == 0:
-            #     print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
-            #           %(epoch, args.num_epochs, i, total_step,
-            #             loss.data[0], np.exp(loss.data[0]), time.time()-t0))
+
+            if i % args.log_step == 0:
+                print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
+                      %(epoch, args.num_epochs, i, total_step,
+                        loss.data[0], np.exp(loss.data[0]), time.time()-t0))
             # else:
             #     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
 
