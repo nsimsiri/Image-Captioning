@@ -16,7 +16,7 @@ def to_var(x, volatile=False):
         x = x.cuda()
     return Variable(x, volatile=volatile)
 
-class EncoderCNN(nn.Module):
+class E2ncoderCNN(nn.Module):
     def __init__(self, embed_size):
         """Load the pretrained ResNet-152 and replace top fc layer."""
         super(EncoderCNN, self).__init__()
@@ -59,6 +59,29 @@ class EncoderCNN(nn.Module):
         features_proj = self._project_features(att_features);
         return features_proj, att_features;
 
+class EncoderCNN(nn.Module):
+    def __init__(self, embed_size):
+        """Load the pretrained ResNet-152 and replace top fc layer."""
+        super(EncoderCNN, self).__init__()
+        resnet = models.resnet152(pretrained=True)
+        modules = list(resnet.children())[:-1]      # delete the last fc layer.
+        self.resnet = nn.Sequential(*modules)
+        self.linear = nn.Linear(resnet.fc.in_features, embed_size)
+        self.bn = nn.BatchNorm1d(embed_size, momentum=0.01)
+        self.init_weights()
+
+    def init_weights(self):
+        """Initialize the weights."""
+        self.linear.weight.data.normal_(0.0, 0.02)
+        self.linear.bias.data.fill_(0)
+
+    def forward(self, images):
+        """Extract the image feature vectors."""
+        features = self.resnet(images)
+        features = Variable(features.data)
+        features = features.view(features.size(0), -1)
+        features = self.bn(self.linear(features))
+        return None, features
 
 class DecoderRNN(nn.Module):
     def __init__(self, embed_size,hidden_size, vocab_size, num_layers, batch_size):
@@ -70,8 +93,10 @@ class DecoderRNN(nn.Module):
         self.H =  hidden_size
         self.L = RESNET_SHAPE[1]*RESNET_SHAPE[2]; #(7 x 7)
         self.D = RESNET_SHAPE[0]; #(2048)
+        self.DEBUG_feat = nn.Linear(self.M, self.H);
         print 'embed_size(M): ',embed_size, 'hidden_size(H): ',hidden_size, \
-        'vocab_size(V): ',vocab_size, 'L: ', self.L, 'D: ', self.D, 'num_layers: ',num_layers
+        'vocab_size(V): ',vocab_size, 'L: ', self.L, 'D: ', self.D, 'num_layers: ',num_layers, \
+        'batch_size', batch_size;
         self.embed = nn.Embedding(self.V, self.M)
         # self.lstm = nn.LSTM(self.M, self.H, num_layers, batch_first=True)
         self.linear = nn.Linear(self.H, self.V)
@@ -99,6 +124,9 @@ class DecoderRNN(nn.Module):
 
     def init_weights(self):
         """Initialize weights."""
+        torch.nn.init.xavier_uniform_(self.DEBUG_feat.weight)
+        self.DEBUG_feat.bias.data.fill_(0)
+
         self.embed.weight.data.uniform_(-0.1, 0.1)
         torch.nn.init.xavier_uniform_( self.linear.weight)
         self.linear.bias.data.fill_(0)
@@ -182,10 +210,12 @@ class DecoderRNN(nn.Module):
             projected_features.shape = (N, L*D), i.e (5, 49*2048 = 100352)
             features = (N, L, D) i.e (N, 49, 2048)
         """
+
         N, T = captions.shape;
         embeddings = self.embed(captions) # = (N, M)
-        next_h, next_c = self.affine_lstm_init(features); # (N,H)
-
+        # next_h, next_c = self.affine_lstm_init(features); # (N,H)
+        next_h = self.DEBUG_feat(features);
+        next_c = to_var(torch.zeros((self.N, self.H)))
         alphas = [];
         h_list = []
         y_i = to_var(Variable(torch.zeros(N, self.V)));
@@ -200,8 +230,6 @@ class DecoderRNN(nn.Module):
             h_list.append(next_h);
 
         outputs = torch.cat(h_list) ;
-        print 'outputs.shape', outputs.shape;
-        print 'linear', self.linear;
         outputs = self.linear(outputs);
         # print 'outputs',outputs.shape;
         return outputs;
