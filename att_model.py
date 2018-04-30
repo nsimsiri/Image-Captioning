@@ -226,8 +226,10 @@ class DecoderRNN(nn.Module):
             # h_list.append(y_i);
             h_list.append(next_h);
 
+
         outputs = torch.cat(h_list) ;
         outputs = self.linear(outputs);
+        outputs = outputs.contiguous().view((N, T, self.V));
         # print 'outputs',outputs.shape;
         return outputs;
 

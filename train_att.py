@@ -8,9 +8,11 @@ from data_loader import get_loader
 from data_loader import get_loader_coco
 from build_vocab import Vocabulary
 from att_model import EncoderCNN, DecoderRNN
+from model import OEncoderCNN, ODecoderRNN
 from torch.autograd import Variable
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
+from masked_cross_entropy import compute_loss;
 import json;
 import sys;
 import time;
@@ -50,6 +52,8 @@ def main(args):
     # Build the models
     encoder = EncoderCNN(args.embed_size)
     decoder = DecoderRNN(args.embed_size, args.hidden_size, len(vocab), args.num_layers)
+    encoder2 = OEncoderCNN(args.embed_size)
+    decoder2 = ODecoderRNN(args.embed_size, args.hidden_size, len(vocab), args.num_layers)
 
     if torch.cuda.is_available():
         print '---- USING GPU ---- '
@@ -64,6 +68,7 @@ def main(args):
     # Train the Models
     total_step = len(data_loader)
     t0 = time.time();
+    print ''
     for epoch in range(args.num_epochs):
         for i, (images, captions, lengths) in enumerate(data_loader):
             # Set mini-batch dataset
@@ -74,9 +79,12 @@ def main(args):
             # Forward, Backward and Optimize
             decoder.zero_grad()
             encoder.zero_grad()
+
             projected_features, features = encoder(images)
             outputs = decoder(projected_features, features, captions, lengths)
-            loss = criterion(outputs, targets2) #targets
+
+            lengths = torch.LongTensor(lengths);
+            loss = compute_loss(outputs, captions, lengths) #targets
             loss.backward()
             optimizer.step()
             # Print log info
@@ -129,7 +137,7 @@ if __name__ == '__main__':
     parser.add_argument('--caption_path', type=str,
                         default='./coco/annotations/sm_captions_train2014.json',
                         help='path for train annotation json file')
-    parser.add_argument('--log_step', type=int , default=100,
+    parser.add_argument('--log_step', type=int , default=50,
                         help='step size for prining log info')
     parser.add_argument('--save_step', type=int , default=10,
                         help='step size for saving trained models')
