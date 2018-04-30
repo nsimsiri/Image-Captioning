@@ -85,7 +85,6 @@ def main(args):
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
 
-            print 'output', outputs.shape;
             # print 'caption-shape',captions.shape;
             # print 'target-shape', targets.shape
             # print 'target2-shape', targets2.shape
