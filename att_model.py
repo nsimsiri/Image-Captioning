@@ -84,10 +84,9 @@ class EncoderCNN(nn.Module):
         return None, features
 
 class DecoderRNN(nn.Module):
-    def __init__(self, embed_size,hidden_size, vocab_size, num_layers, batch_size):
+    def __init__(self, embed_size,hidden_size, vocab_size, num_layers):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
-        self.N = batch_size;
         self.V = vocab_size
         self.M = embed_size
         self.H =  hidden_size
@@ -95,8 +94,7 @@ class DecoderRNN(nn.Module):
         self.D = RESNET_SHAPE[0]; #(2048)
         self.DEBUG_feat = nn.Linear(self.M, self.H);
         print 'embed_size(M): ',embed_size, 'hidden_size(H): ',hidden_size, \
-        'vocab_size(V): ',vocab_size, 'L: ', self.L, 'D: ', self.D, 'num_layers: ',num_layers, \
-        'batch_size', batch_size;
+        'vocab_size(V): ',vocab_size, 'L: ', self.L, 'D: ', self.D, 'num_layers: '
         self.embed = nn.Embedding(self.V, self.M)
         # self.lstm = nn.LSTM(self.M, self.H, num_layers, batch_first=True)
         self.linear = nn.Linear(self.H, self.V)
@@ -214,7 +212,7 @@ class DecoderRNN(nn.Module):
         embeddings = self.embed(captions) # = (N, M)
         # next_h, next_c = self.affine_lstm_init(features); # (N,H)
         next_h = self.DEBUG_feat(features);
-        next_c = to_var(torch.zeros((self.N, self.H)))
+        next_c = to_var(torch.zeros((N, self.H)))
         alphas = [];
         h_list = []
         y_i = to_var(Variable(torch.zeros(N, self.V)));
@@ -223,13 +221,7 @@ class DecoderRNN(nn.Module):
             # embedding_i = torch.cat((embeddings[:,i,:], ctx_vector), 1);
             embedding_i = embeddings[:,i,:]
             # expects input = (N, M), h,c = (N, H)
-            try:
-                next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));
-            except Exception as e:
-                print e;
-                print next_h.shape, next_c.shape, self.lstm_cell, embedding_i.shape;
-                sys.exit();
-
+            next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));
             # y_i = self.attention_lstm_decode_layer(ctx_vector, next_h, y_i); #(N, V)
             # h_list.append(y_i);
             h_list.append(next_h);

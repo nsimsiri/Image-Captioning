@@ -49,7 +49,7 @@ def main(args):
     print '----- DATA_LOADER -- loaded data ----'
     # Build the models
     encoder = EncoderCNN(args.embed_size)
-    decoder = DecoderRNN(args.embed_size, args.hidden_size, len(vocab), args.num_layers, args.batch_size)
+    decoder = DecoderRNN(args.embed_size, args.hidden_size, len(vocab), args.num_layers)
 
     if torch.cuda.is_available():
         print '---- USING GPU ---- '
