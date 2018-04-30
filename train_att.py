@@ -17,7 +17,6 @@ import sys;
 import time;
 #
 NAME = 'DEBUG'
-MAX_T = 50;
 def to_var(x, volatile=False):
     if torch.cuda.is_available():
         x = x.cuda()
@@ -72,9 +71,7 @@ def main(args):
             # Set mini-batch dataset
             N, T = captions.shape;
             images = to_var(images, volatile=True)
-            # pad = nn.ConstantPad2d((0, MAX_T - T, 0, 0), 0)
             captions = to_var(captions)
-            # captions = pad(captions);
             targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
             targets2 = captions.view((captions.shape[0]*captions.shape[1], ));
             # Forward, Backward and Optimize
@@ -85,9 +82,9 @@ def main(args):
             outputs = decoder(projected_features, features, captions, lengths)
 
             # lengths = torch.cuda.LongTensor(lengths);
-            # lengths = torch.LongTensor(lengths);
-            loss = criterion(outputs, targets);
-            # loss = compute_loss(outputs, captions, lengths) #targets
+            lengths = torch.LongTensor(lengths);
+            # loss = criterion(outputs, targets);
+            loss = compute_loss(outputs, captions, lengths) #targets
             loss.backward()
             optimizer.step()
             # Print log info
