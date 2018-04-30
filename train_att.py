@@ -103,10 +103,11 @@ def main(args):
             print sentence
             sys.exit()
             '''
-            if i % args.log_step == 0:
-                print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
-                      %(epoch, args.num_epochs, i, total_step,
-                        loss.data[0], np.exp(loss.data[0]), time.time()-t0))
+            print i;
+            # if i % args.log_step == 0:
+            #     print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
+            #           %(epoch, args.num_epochs, i, total_step,
+            #             loss.data[0], np.exp(loss.data[0]), time.time()-t0))
             # else:
             #     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
 
