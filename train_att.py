@@ -17,6 +17,7 @@ import sys;
 import time;
 #
 NAME = 'DEBUG'
+MAX_T = 50;
 def to_var(x, volatile=False):
     if torch.cuda.is_available():
         x = x.cuda()
@@ -50,7 +51,7 @@ def main(args):
     print '----- DATA_LOADER -- loaded data ----'
     # Build the models
     encoder = EncoderCNN(args.embed_size)
-    decoder = DecoderRNN(args.embed_size, args.hidden_size, len(vocab), args.num_layers)
+    decoder = DecoderRNN(args.embed_size, args.hidden_size, len(vocab), args.num_layers, batch_size=args.batch_size)
 
     if torch.cuda.is_available():
         print '---- USING GPU ---- '
@@ -69,8 +70,11 @@ def main(args):
     for epoch in range(args.num_epochs):
         for i, (images, captions, lengths) in enumerate(data_loader):
             # Set mini-batch dataset
+            N, T = captions.shape;
             images = to_var(images, volatile=True)
+            # pad = nn.ConstantPad2d((0, MAX_T - T, 0, 0), 0)
             captions = to_var(captions)
+            # captions = pad(captions);
             targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
             targets2 = captions.view((captions.shape[0]*captions.shape[1], ));
             # Forward, Backward and Optimize
@@ -80,7 +84,8 @@ def main(args):
             projected_features, features = encoder(images)
             outputs = decoder(projected_features, features, captions, lengths)
 
-            lengths = torch.cuda.LongTensor(lengths);
+            # lengths = torch.cuda.LongTensor(lengths);
+            lengths = torch.LongTensor(lengths);
             loss = compute_loss(outputs, captions, lengths) #targets
             loss.backward()
             optimizer.step()

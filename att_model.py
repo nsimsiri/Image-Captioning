@@ -10,7 +10,7 @@ import sys;
 
 RESNET_SHAPE = (2048, 7, 7)
 RESNET_LAYER = -2
-
+MAX_T = 50;
 def to_var(x, volatile=False):
     if torch.cuda.is_available():
         x = x.cuda()
@@ -84,15 +84,17 @@ class EncoderCNN(nn.Module):
         return None, features
 
 class DecoderRNN(nn.Module):
-    def __init__(self, embed_size,hidden_size, vocab_size, num_layers):
+    def __init__(self, embed_size,hidden_size, vocab_size, num_layers, batch_size=5):
         """Set the hyper-parameters and build the layers."""
         super(DecoderRNN, self).__init__()
+        self.N = batch_size;
         self.V = vocab_size
         self.M = embed_size
         self.H =  hidden_size
         self.L = RESNET_SHAPE[1]*RESNET_SHAPE[2]; #(7 x 7)
         self.D = RESNET_SHAPE[0]; #(2048)
         self.DEBUG_feat = nn.Linear(self.M, self.H);
+        self.batch_size = batch_size;
         print 'embed_size(M): ',embed_size, 'hidden_size(H): ',hidden_size, \
         'vocab_size(V): ',vocab_size, 'L: ', self.L, 'D: ', self.D, 'num_layers: '
         self.embed = nn.Embedding(self.V, self.M)
@@ -227,9 +229,10 @@ class DecoderRNN(nn.Module):
             h_list.append(next_h);
 
 
-        outputs = torch.cat(h_list) ;
+        outputs = torch.cat(h_list)
+        outputs = outputs.contiguous().view((N, T, -1));
         outputs = self.linear(outputs);
-        outputs = outputs.contiguous().view((N, T, self.V));
+        # outputs = outputs.contiguous().view((N, T, self.V));
         # print 'outputs',outputs.shape;
         return outputs;
 
@@ -264,7 +267,7 @@ class DecoderRNN(nn.Module):
 
 
 '''
-    def sample(self, features, states=None):
+    def sample(selff, features, states=None):
         """Samples captions for given image features (Greedy search)."""
         sampled_ids = []
         inputs = features.unsqueeze(1)
