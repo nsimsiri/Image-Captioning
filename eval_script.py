@@ -3,7 +3,7 @@ import numpy as np
 import skimage.io as io
 import matplotlib.pyplot as plt
 from PIL import Image
-from sample import *
+from att_sample import *
 import torch
 import argparse
 from PIL import Image
@@ -17,10 +17,12 @@ import json
 import copy;
 import pickle
 
-_IS_GRU = 1
-IS_GRU = (lambda: _IS_GRU == 1);
-GENCAP_DIR = './gen_caps/GRU_EXP_FIX.pkl'
-XODER_PATH = './models/'
+ENC = '001'
+ENC = '%s-encoder-40-1001.pkl';
+DEC = '%s-dec-40-1001.pkl';
+GENCAP_DIR = './gen_caps/ATT.pkl'
+XODER_PATH = './models/ATT/'
+
 dataDir='./coco'
 mypath = "./data/val_resized2014"
 # mypath = "./data/resized2014"
@@ -41,10 +43,8 @@ class Args(object):
         img_location = './coco/%s/%s'%(folder,img_file_name);
         if hardpath!=None:
             img_location = hardpath+"/"+img_file_name;
-#         self.encoder_path = './models/encoder-5-3000.pkl'
-#         self.decoder_path = './models/decoder-5-3000.pkl'
-        self.encoder_path = XODER_PATH + enc#'./models/1_256_512_encoder-5-1001.pkl'
-        self.decoder_path = XODER_PATH + dec#'./models/1_256_512_decoder-5-1001.pkl'
+        self.encoder_path = XODER_PATH + ENC#'./models/1_256_512_encoder-5-1001.pkl'
+        self.decoder_path = XODER_PATH + DEC#'./models/1_256_512_decoder-5-1001.pkl'
         self.vocab_path = './data/vocab.pkl'
         self.embed_size = 256
         self.hidden_size = 512;
@@ -53,10 +53,9 @@ class Args(object):
         self.encoder = None;
         self.decoder = None;
         self.vocab = None;
-        self.use_gru = _IS_GRU;
     def __str__(self):
-        return 'Arg[%s img_loc=%s, enc=%s, dec=%s, emb=%s, hid=%s, nlayer=%s]'%(\
-                'GRU' if IS_GRU() else 'LSTM', self.image, self.encoder_path, \
+        return 'Arg[ATT img_loc=%s, enc=%s, dec=%s, emb=%s, hid=%s, nlayer=%s]'%(\
+                self.image, self.encoder_path, \
                 self.decoder_path, self.embed_size, self.hidden_size, self.num_layers);
 
 for (dirpath, dirnames, filenames) in walk(mypath):
@@ -82,7 +81,7 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
         cached_encoder = None;
         cached_decoder = None;
 
-        print 'Evaluating model - nlayer:% s emb:%s hid:%s'%(num_layers, embed_size, hidden_size);
+        print 'Evaluating model enc=%s dec=%s'%(, );
         for img_id in imgIds:
 
             print '--\nevaluating img: ', img_id
