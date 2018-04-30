@@ -104,6 +104,7 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
             caption, cached_encoder, cached_decoder, cached_vocab = main(args, show_img=False);
             caption = caption.replace('<start>','').replace('<end>','')
             caption_obj['caption'] = caption;
+            print caption;
             GEN_CAPS.append(caption_obj);
             # except Exception as e:
             #     print '\n-- erorr on img_id', img_id,'\n',e,'\n';
