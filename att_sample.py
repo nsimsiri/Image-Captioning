@@ -34,20 +34,19 @@ def main(args, show_img=False):
                              (0.229, 0.224, 0.225))])
 
     # Load vocabulary wrapper
-    # vocab = args.vocab;
-    # if (args.vocab is None):
-    with open(args.vocab_path, 'rb') as f:
-        vocab = pickle.load(f)
+    vocab = args.vocab;
+    if (args.vocab is None):
+        with open(args.vocab_path, 'rb') as f:
+            vocab = pickle.load(f)
 
     # Build Models
-    # encoder = args.encoder;
-    # decoder = args.decoder;
-    # if (args.encoder is None and args.decoder is None):
-    encoder = EncoderCNN(args.embed_size)
-    encoder.eval()  # evaluation mode (BN uses moving mean/variance)
-    decoder = DecoderRNN(args.embed_size, args.hidden_size,
-                         len(vocab), args.num_layers, 1)
-
+    encoder = args.encoder;
+    decoder = args.decoder;
+    if (args.encoder is None and args.decoder is None):
+        encoder = EncoderCNN(args.embed_size)
+        encoder.eval()  # evaluation mode (BN uses moving mean/variance)
+        decoder = DecoderRNN(args.embed_size, args.hidden_size,
+                             len(vocab), args.num_layers, 1)
 
     # Load the trained model parameters
     encoder.load_state_dict(torch.load(args.encoder_path))

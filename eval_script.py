@@ -17,20 +17,18 @@ import json
 import copy;
 import pickle
 
-ENC = '001'
-ENC = '%s-encoder-40-1001.pkl';
-DEC = '%s-dec-40-1001.pkl';
+ATT_HID = 512;
+ATT_EMB = 512;
 GENCAP_DIR = './gen_caps/ATT.pkl'
-XODER_PATH = './models/ATT/'
-
+XODER_PATH = './models/ATT/B/'
 dataDir='./coco'
 mypath = "./data/val_resized2014"
 # mypath = "./data/resized2014"
 VAL = 'val2014';
 TR = 'train2014';
 GEN_CAP_DIR = './gen_caps'
-dataType='val2014'
-# dataType='train2014'
+# dataType='val2014'
+dataType='train2014'
 annFile='{}/annotations/sm_captions_{}.json'.format(dataDir,dataType)
 print annFile
 coco = COCO(annFile)
@@ -43,11 +41,11 @@ class Args(object):
         img_location = './coco/%s/%s'%(folder,img_file_name);
         if hardpath!=None:
             img_location = hardpath+"/"+img_file_name;
-        self.encoder_path = XODER_PATH + ENC#'./models/1_256_512_encoder-5-1001.pkl'
-        self.decoder_path = XODER_PATH + DEC#'./models/1_256_512_decoder-5-1001.pkl'
+        self.encoder_path = XODER_PATH + enc#'./models/1_256_512_encoder-5-1001.pkl'
+        self.decoder_path = XODER_PATH + dec#'./models/1_256_512_decoder-5-1001.pkl'
         self.vocab_path = './data/vocab.pkl'
-        self.embed_size = 256
-        self.hidden_size = 512;
+        self.embed_size = ATT_EMB
+        self.hidden_size = ATT_HID  ;
         self.num_layers = 1;
         self.image = img_location;
         self.encoder = None;
@@ -66,32 +64,32 @@ for (dirpath, dirnames, filenames) in walk(XODER_PATH):
     for fn in filenames:
         for xoder in ['decoder', 'encoder']:
             if (xoder in fn):
-                arg = filter(lambda x: len(x.strip())!=0, fn.split(xoder)[0].split("_"))
-                arg2xoder[tuple(arg)][xoder] = fn;
+                arg = 'ATT';
+                arg2xoder[arg][xoder] = fn;
+                # arg = filter(lambda x: len(x.strip())!=0, fn.split(xoder)[0].split("_"))
+                # arg2xoder[tuple(arg)][xoder] = fn;
 
     # for each models
     EVAL_MAP = {};
     cached_vocab = None;
     for arg, xoder2fn in arg2xoder.iteritems():
-        print '-------';
-        num_layers = arg[0]
-        embed_size = arg[1];
-        hidden_size = arg[2];
+        print '--------------------------';
+        # num_layers = arg[0]
+        # embed_size = arg[1];
+        # hidden_size = arg[2];
         GEN_CAPS = []
         cached_encoder = None;
         cached_decoder = None;
 
-        print 'Evaluating model enc=%s dec=%s'%(, );
         for img_id in imgIds:
-
             print '--\nevaluating img: ', img_id
             try :
                 img = coco.loadImgs(img_id)[0] # index 0 because only 1 img return ie. coco.loadImgs.. = [img_we_want]
                 args = Args(img['file_name'], hardpath=('./data/val_resized2014' if dataType==VAL else './data/resized2014'), \
                             enc=xoder2fn['encoder'], dec=xoder2fn['decoder']);
-                args.num_layers = int(num_layers);
-                args.embed_size = int(embed_size);
-                args.hidden_size = int(hidden_size);
+                # args.num_layers = int(num_layers);
+                # args.embed_size = int(embed_size);
+                # args.hidden_size = int(hidden_size);
                 coco.dataset['type'] = None; # to fix bug with diff versio.
                 annIds = coco.getAnnIds(imgIds=[img['id']])
                 ann = coco.loadAnns(annIds)
