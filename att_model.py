@@ -74,7 +74,7 @@ class DecoderRNN(nn.Module):
         'vocab_size(V): ',vocab_size, 'L: ', self.L, 'D: ', self.D, 'num_layers: ',num_layers
         self.embed = nn.Embedding(self.V, self.M)
         # self.lstm = nn.LSTM(self.M, self.H, num_layers, batch_first=True)
-        # self.linear = nn.Linear(self.H, self.V)
+        self.linear = nn.Linear(self.H, self.V)
         # encode feature
         self._affine_lstm_init_h = nn.Linear(self.D, self.H);
         self._affine_lstm_init_c = nn.Linear(self.D, self.H);
@@ -82,7 +82,8 @@ class DecoderRNN(nn.Module):
         self._affine_feat_proj_att = nn.Linear(self.H, self.D);
         self._affine_att = nn.Linear(self.D, 1);
         # LSTM cell
-        self.lstm_cell = nn.LSTMCell(self.M + self.D, self.H);
+        # self.lstm_cell = nn.LSTMCell(self.M + self.D, self.H);
+        self.lstm_cell = nn.LSTMCell(self.M, self.H);
         # attention lstm decode sub-layers; - Equation(7)
         self._affine_decode_h = nn.Linear(self.H, self.M);
         self._affine_decode_ctx = nn.Linear(self.D, self.M);
@@ -99,6 +100,8 @@ class DecoderRNN(nn.Module):
     def init_weights(self):
         """Initialize weights."""
         self.embed.weight.data.uniform_(-0.1, 0.1)
+        torch.nn.init.xavier_uniform_( self.linear.weight)
+        self.linear.bias.data.fill_(0)
 
         # initial lstm sub-layers
         self._affine_lstm_init_h.bias.data.fill_(0)
@@ -187,14 +190,19 @@ class DecoderRNN(nn.Module):
         h_list = []
         y_i = to_var(Variable(torch.zeros(N, self.V)));
         for i in range(0,T):
-            ctx_vector, alpha = self.attention_layer(next_h, projected_features, features);
-            embedding_i = torch.cat((embeddings[:,i,:], ctx_vector), 1);
-
+            # ctx_vector, alpha = self.attention_layer(next_h, projected_features, features);
+            # embedding_i = torch.cat((embeddings[:,i,:], ctx_vector), 1);
+            embedding_i = embeddings[:,i,:]
             # expects input = (N, M), h,c = (N, H)
             next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));
-            y_i = self.attention_lstm_decode_layer(ctx_vector, next_h, y_i); #(N, V)
-            h_list.append(y_i);
+            # y_i = self.attention_lstm_decode_layer(ctx_vector, next_h, y_i); #(N, V)
+            # h_list.append(y_i);
+            h_list.append(next_h);
+
         outputs = torch.cat(h_list) ;
+        print 'outputs.shape', outputs.shape;
+        print 'linear', self.linear;
+        outputs = self.linear(outputs);
         # print 'outputs',outputs.shape;
         return outputs;
 

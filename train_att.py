@@ -15,7 +15,7 @@ import json;
 import sys;
 import time;
 #
-
+NAME = 'DEBUG'
 def to_var(x, volatile=False):
     if torch.cuda.is_available():
         x = x.cuda()
@@ -104,17 +104,17 @@ def main(args):
             # Save the models
             # if (i+1) % args.save_step == 0:
                 #pass
-                
+
     print 'saving final model';
     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
     torch.save(decoder.state_dict(),
                os.path.join(args.model_path,
                             # name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "decoder", epoch, i)))
-                            'att-decoder-%d-%d.pkl' %(epoch+1, i+1)))
+                            '%s-att-decoder-%d-%d.pkl' %(NAME, epoch+1, i+1)))
     torch.save(encoder.state_dict(),
                os.path.join(args.model_path,
                             # name_pretrained_sizes(args.num_layers, args.embed_size, args.hidden_size, "encoder", epoch, i)))
-                            'att-encoder-%d-%d.pkl' %(epoch+1, i+1)))
+                            '%s-att-encoder-%d-%d.pkl' %(NAME,epoch+1, i+1)))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -135,15 +135,15 @@ if __name__ == '__main__':
                         help='step size for saving trained models')
 
     # Model parameters
-    parser.add_argument('--embed_size', type=int , default=16 , #256
+    parser.add_argument('--embed_size', type=int , default=32 , #256
                         help='dimension of word embedding vectors')
-    parser.add_argument('--hidden_size', type=int , default=32 , #512
+    parser.add_argument('--hidden_size', type=int , default=64 , #512
                         help='dimension of lstm hidden states')
     parser.add_argument('--num_layers', type=int , default=1 ,
                         help='number of layers in lstm')
 
     parser.add_argument('--num_epochs', type=int, default=1)
-    parser.add_argument('--batch_size', type=int, default=10) #128
+    parser.add_argument('--batch_size', type=int, default=5) #128
     parser.add_argument('--num_workers', type=int, default=2)
     parser.add_argument('--learning_rate', type=float, default=0.005)
     args = parser.parse_args()
