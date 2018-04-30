@@ -210,7 +210,6 @@ class DecoderRNN(nn.Module):
             projected_features.shape = (N, L*D), i.e (5, 49*2048 = 100352)
             features = (N, L, D) i.e (N, 49, 2048)
         """
-        print 'self.N', self.N
         N, T = captions.shape;
         embeddings = self.embed(captions) # = (N, M)
         # next_h, next_c = self.affine_lstm_init(features); # (N,H)
@@ -224,8 +223,11 @@ class DecoderRNN(nn.Module):
             # embedding_i = torch.cat((embeddings[:,i,:], ctx_vector), 1);
             embedding_i = embeddings[:,i,:]
             # expects input = (N, M), h,c = (N, H)
-            print 'next_c',next_c.shape;
-            next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));
+            try:
+                next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));
+            except Exception e:
+                print e;
+                print next_h.shape, next_c.shape, self.lstm_cell, embedding_i.shape;
 
             # y_i = self.attention_lstm_decode_layer(ctx_vector, next_h, y_i); #(N, V)
             # h_list.append(y_i);
