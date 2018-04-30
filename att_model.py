@@ -95,8 +95,8 @@ class DecoderRNN(nn.Module):
         self.D = RESNET_SHAPE[0]; #(2048)
         self.DEBUG_feat = nn.Linear(self.M, self.H);
         self.batch_size = batch_size;
-        print 'embed_size(M): ',embed_size, 'hidden_size(H): ',hidden_size, \
-        'vocab_size(V): ',vocab_size, 'L: ', self.L, 'D: ', self.D, 'num_layers: '
+        print 'emb_size(M): ',embed_size, 'hid_size(H): ',hidden_size, \
+        'voc_size(V): ',vocab_size, 'L: ', self.L, 'D: ', self.D, 'num_layers: '
         self.embed = nn.Embedding(self.V, self.M)
         # self.lstm = nn.LSTM(self.M, self.H, num_layers, batch_first=True)
         self.linear = nn.Linear(self.H, self.V)
@@ -213,11 +213,13 @@ class DecoderRNN(nn.Module):
         N, T = captions.shape;
         embeddings = self.embed(captions) # = (N, M)
         # next_h, next_c = self.affine_lstm_init(features); # (N,H)
-        next_h = self.DEBUG_feat(features);
+        # next_h = self.DEBUG_feat(features);
         next_c = to_var(torch.zeros((N, self.H)))
+        next_h= to_var(torch.zeros((N, self.H)))
         alphas = [];
         h_list = []
         y_i = to_var(Variable(torch.zeros(N, self.V)));
+        embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         for i in range(0,T):
             # ctx_vector, alpha = self.attention_layer(next_h, projected_features, features);
             # embedding_i = torch.cat((embeddings[:,i,:], ctx_vector), 1);
@@ -228,10 +230,10 @@ class DecoderRNN(nn.Module):
             # h_list.append(y_i);
             h_list.append(next_h);
 
-
         outputs = torch.cat(h_list)
         outputs = outputs.contiguous().view((N, T, -1));
-        outputs = self.linear(outputs);
+        packed = pack_padded_sequence(outputs, lengths, batch_first=True);
+        outputs = self.linear(packed[0]);
         # outputs = outputs.contiguous().view((N, T, self.V));
         # print 'outputs',outputs.shape;
         return outputs;

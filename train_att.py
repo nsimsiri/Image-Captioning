@@ -84,9 +84,10 @@ def main(args):
             projected_features, features = encoder(images)
             outputs = decoder(projected_features, features, captions, lengths)
 
-            lengths = torch.cuda.LongTensor(lengths);
+            # lengths = torch.cuda.LongTensor(lengths);
             # lengths = torch.LongTensor(lengths);
-            loss = compute_loss(outputs, captions, lengths) #targets
+            loss = criterion(outputs, targets);
+            # loss = compute_loss(outputs, captions, lengths) #targets
             loss.backward()
             optimizer.step()
             # Print log info
