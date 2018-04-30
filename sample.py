@@ -65,7 +65,7 @@ def main(args, show_img=True):
     # Prepare Image
     image = load_image(args.image, transform)
     image_tensor = to_var(image, volatile=True)
-
+    
     # If use gpu
     if torch.cuda.is_available():
         encoder.cuda()
