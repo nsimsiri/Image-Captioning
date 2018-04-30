@@ -225,9 +225,10 @@ class DecoderRNN(nn.Module):
             # expects input = (N, M), h,c = (N, H)
             try:
                 next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));
-            except Exception e:
+            except Exception as e:
                 print e;
                 print next_h.shape, next_c.shape, self.lstm_cell, embedding_i.shape;
+                sys.exit();
 
             # y_i = self.attention_lstm_decode_layer(ctx_vector, next_h, y_i); #(N, V)
             # h_list.append(y_i);
