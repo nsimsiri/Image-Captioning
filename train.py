@@ -61,6 +61,7 @@ def main(args):
         encoder.cuda()
         decoder.cuda()
 
+
     # Loss and Optimizer
     criterion = nn.CrossEntropyLoss()
     params = list(decoder.parameters()) + list(encoder.linear.parameters()) + list(encoder.bn.parameters())
@@ -84,10 +85,17 @@ def main(args):
             encoder.zero_grad()
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
+            sampled_ids = decoder.sample(images);
+            sampled_ids = sampled_ids.cpu().data.numpy()
 
-            # print 'caption-shape',captions.shape;
-            # print 'target-shape', targets.shape
-            # print 'target2-shape', targets2.shape
+            # Decode word_ids to words
+            sampled_caption = []
+            for word_id in sampled_ids:
+                word = vocab.idx2word[word_id]
+                sampled_caption.append(word)
+                if word == '<end>':
+                    break
+            sentence = ' '.join(sampled_caption)
             loss = criterion(outputs, targets) #targets
             loss.backward()
             optimizer.step()

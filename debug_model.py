@@ -261,13 +261,9 @@ class DecoderRNN(nn.Module):
         sampled_ids = []
         start = torch.cuda.LongTensor([1]*N).cuda();
         embeddings = self.embed(start);
-        y_i = to_var(Variable(torch.zeros(N, self.V)));
         for i in range(20):                                      # maximum sampling length
-            alphas = [];
-            h_list = []
             ctx_vector, alpha = self.attention_layer(next_h, projected_features, features);
             embedding_i = torch.cat((embeddings, ctx_vector), 1);
-
             # expects input = (N, M), h,c = (N, H)
             next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));
             y_i = self.attention_lstm_decode_layer(ctx_vector, next_h, y_i); #(N, V)

@@ -240,6 +240,29 @@ class DecoderRNN(nn.Module):
         ''''<start>': 1
         <end>': 2
         '''
+
+        N = features.shape[0];
+        inputs = features.unsqueeze(1)
+        sampled_ids = []
+        start = torch.cuda.LongTensor([1]*N).cuda();
+        embeddings = self.embed(start);
+        for i in range(20):                                      # maximum sampling length
+            embedding_i = embeddings[:,i,:];
+            # expects input = (N, M), h,c = (N, H)
+            next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));
+            word_idx = torch.max(y_i, 1)[1];
+            sampled_ids.append(word_idx)
+            embeddings = self.embed(word_idx);
+
+        sampled_ids = torch.cat(sampled_ids, 0);
+        sampled_ids = sampled_ids.squeeze()
+        return sampled_ids;
+
+'''
+    def sample(self, features, projected_features, states=None, vocab=None):
+        # <start>: 1
+        # <end>: 2
+        #
         print 'sampling'
         alphas = []
         N = features.shape[0];
@@ -264,7 +287,7 @@ class DecoderRNN(nn.Module):
         sampled_ids = torch.cat(sampled_ids, 0);
         sampled_ids = sampled_ids.squeeze()
         return sampled_ids;
-
+'''
 
 '''
     def sample(selff, features, states=None):

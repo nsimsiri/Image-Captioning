@@ -1,3 +1,151 @@
+Namespace(batch_size=20, caption_path='./coco/annotations/sm_captions_train2014.json', crop_size=224, embed_size=256, hidden_size=512, image_dir='./data/resized2014', learning_rate=0.001, log_step=50, model_path='./models/ATT', num_epochs=5, num_layers=1, num_workers=2, save_step=10, vocab_path='./data/vocab.pkl')
+loading annotations into memory...
+0:00:00.109659
+creating index...
+index created!
+----- DATA_LOADER -- loaded data ----
+emb_size(M):  256 hid_size(H):  512 voc_size(V):  9956 L:  49 D:  2048 num_layers:
+---- USING GPU ----
+
+train_att.py:24: UserWarning: volatile was removed and now has no effect. Use `with torch.no_grad():` instead.
+  return Variable(x, volatile=volatile)
+train_att.py:112: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  loss.data[0], np.exp(loss.data[0]), time.time()-t0))
+Epoch [0/5], Step [0/1251], Loss: 9.2057, Perplexity: 9953.3613, Time: 0.5365
+Epoch [0/5], Step [50/1251], Loss: 5.2214, Perplexity: 185.1931, Time: 9.4436
+Epoch [0/5], Step [100/1251], Loss: 5.3462, Perplexity: 209.8059, Time: 18.4098
+Epoch [0/5], Step [150/1251], Loss: 5.5537, Perplexity: 258.1791, Time: 27.2216
+Epoch [0/5], Step [200/1251], Loss: 5.1423, Perplexity: 171.1105, Time: 36.3257
+Epoch [0/5], Step [250/1251], Loss: 5.2439, Perplexity: 189.4157, Time: 45.6240
+Epoch [0/5], Step [300/1251], Loss: 5.3427, Perplexity: 209.0744, Time: 55.5492
+Epoch [0/5], Step [350/1251], Loss: 4.9513, Perplexity: 141.3578, Time: 64.4858
+Epoch [0/5], Step [400/1251], Loss: 5.1620, Perplexity: 174.5152, Time: 73.4324
+Epoch [0/5], Step [450/1251], Loss: 5.3030, Perplexity: 200.9452, Time: 82.3732
+Epoch [0/5], Step [500/1251], Loss: 5.2088, Perplexity: 182.8751, Time: 91.2236
+Epoch [0/5], Step [550/1251], Loss: 5.3814, Perplexity: 217.3213, Time: 100.1505
+Epoch [0/5], Step [600/1251], Loss: 5.2810, Perplexity: 196.5704, Time: 109.4409
+Epoch [0/5], Step [650/1251], Loss: 5.3778, Perplexity: 216.5526, Time: 118.9456
+Epoch [0/5], Step [700/1251], Loss: 5.4634, Perplexity: 235.8985, Time: 128.4072
+Epoch [0/5], Step [750/1251], Loss: 5.3487, Perplexity: 210.3360, Time: 137.9196
+Epoch [0/5], Step [800/1251], Loss: 5.5543, Perplexity: 258.3379, Time: 147.4043
+Epoch [0/5], Step [850/1251], Loss: 4.9935, Perplexity: 147.4464, Time: 156.9335
+Epoch [0/5], Step [900/1251], Loss: 5.2703, Perplexity: 194.4724, Time: 166.6176
+Epoch [0/5], Step [950/1251], Loss: 5.3003, Perplexity: 200.3927, Time: 176.0095
+Epoch [0/5], Step [1000/1251], Loss: 5.2613, Perplexity: 192.7291, Time: 185.4701
+Epoch [0/5], Step [1050/1251], Loss: 5.4079, Perplexity: 223.1735, Time: 195.1634
+Epoch [0/5], Step [1100/1251], Loss: 4.9373, Perplexity: 139.3920, Time: 204.7536
+Epoch [0/5], Step [1150/1251], Loss: 5.1406, Perplexity: 170.8215, Time: 214.1991
+Epoch [0/5], Step [1200/1251], Loss: 5.2675, Perplexity: 193.9271, Time: 223.6946
+Epoch [0/5], Step [1250/1251], Loss: 5.3078, Perplexity: 201.9028, Time: 233.1423
+Epoch [1/5], Step [0/1251], Loss: 4.9994, Perplexity: 148.3256, Time: 233.6981
+Epoch [1/5], Step [50/1251], Loss: 5.0426, Perplexity: 154.8793, Time: 243.1951
+Epoch [1/5], Step [100/1251], Loss: 5.0272, Perplexity: 152.5069, Time: 252.8287
+Epoch [1/5], Step [150/1251], Loss: 5.0557, Perplexity: 156.9152, Time: 262.3030
+Epoch [1/5], Step [200/1251], Loss: 5.4542, Perplexity: 233.7478, Time: 271.7978
+Epoch [1/5], Step [250/1251], Loss: 5.2703, Perplexity: 194.4650, Time: 281.4507
+Epoch [1/5], Step [300/1251], Loss: 5.2328, Perplexity: 187.3146, Time: 291.2122
+Epoch [1/5], Step [350/1251], Loss: 5.1923, Perplexity: 179.8733, Time: 300.6738
+Epoch [1/5], Step [400/1251], Loss: 5.1474, Perplexity: 171.9835, Time: 310.1836
+Epoch [1/5], Step [450/1251], Loss: 5.1376, Perplexity: 170.3115, Time: 319.6293
+Epoch [1/5], Step [500/1251], Loss: 5.3313, Perplexity: 206.7016, Time: 329.2755
+Epoch [1/5], Step [550/1251], Loss: 5.2664, Perplexity: 193.7135, Time: 338.8143
+Epoch [1/5], Step [600/1251], Loss: 5.2738, Perplexity: 195.1653, Time: 348.3784
+Epoch [1/5], Step [650/1251], Loss: 5.0213, Perplexity: 151.6093, Time: 357.9022
+Epoch [1/5], Step [700/1251], Loss: 5.1378, Perplexity: 170.3474, Time: 367.5291
+Epoch [1/5], Step [750/1251], Loss: 5.3372, Perplexity: 207.9312, Time: 377.1433
+Epoch [1/5], Step [800/1251], Loss: 4.9863, Perplexity: 146.3955, Time: 386.7163
+Epoch [1/5], Step [850/1251], Loss: 5.4013, Perplexity: 221.6925, Time: 396.2537
+Epoch [1/5], Step [900/1251], Loss: 5.3331, Perplexity: 207.0714, Time: 405.7294
+Epoch [1/5], Step [950/1251], Loss: 5.0296, Perplexity: 152.8754, Time: 415.2366
+Epoch [1/5], Step [1000/1251], Loss: 4.9509, Perplexity: 141.3011, Time: 425.2641
+Epoch [1/5], Step [1050/1251], Loss: 5.1083, Perplexity: 165.3815, Time: 434.7531
+Epoch [1/5], Step [1100/1251], Loss: 5.3193, Perplexity: 204.2417, Time: 444.1794
+Epoch [1/5], Step [1150/1251], Loss: 5.4013, Perplexity: 221.6888, Time: 453.8652
+Epoch [1/5], Step [1200/1251], Loss: 5.1682, Perplexity: 175.5967, Time: 463.2587
+Epoch [1/5], Step [1250/1251], Loss: 5.3833, Perplexity: 217.7372, Time: 472.6646
+Epoch [2/5], Step [0/1251], Loss: 5.1740, Perplexity: 176.6283, Time: 473.1840
+Epoch [2/5], Step [50/1251], Loss: 5.2203, Perplexity: 184.9933, Time: 482.7380
+Epoch [2/5], Step [100/1251], Loss: 5.0673, Perplexity: 158.7392, Time: 492.1964
+Epoch [2/5], Step [150/1251], Loss: 4.9900, Perplexity: 146.9374, Time: 501.7664
+Epoch [2/5], Step [200/1251], Loss: 5.4144, Perplexity: 224.6217, Time: 511.3206
+Epoch [2/5], Step [250/1251], Loss: 5.3271, Perplexity: 205.8464, Time: 520.8645
+Epoch [2/5], Step [300/1251], Loss: 4.9860, Perplexity: 146.3536, Time: 530.3667
+Epoch [2/5], Step [350/1251], Loss: 5.3743, Perplexity: 215.7866, Time: 540.2169
+Epoch [2/5], Step [400/1251], Loss: 5.2226, Perplexity: 185.4171, Time: 549.6994
+Epoch [2/5], Step [450/1251], Loss: 5.1334, Perplexity: 169.5986, Time: 559.0313
+Epoch [2/5], Step [500/1251], Loss: 4.8810, Perplexity: 131.7616, Time: 568.3447
+Epoch [2/5], Step [550/1251], Loss: 5.1469, Perplexity: 171.8979, Time: 577.7742
+Epoch [2/5], Step [600/1251], Loss: 4.9404, Perplexity: 139.8316, Time: 587.2708
+Epoch [2/5], Step [650/1251], Loss: 5.0577, Perplexity: 157.2334, Time: 596.8514
+Epoch [2/5], Step [700/1251], Loss: 5.3303, Perplexity: 206.5024, Time: 606.5123
+Epoch [2/5], Step [750/1251], Loss: 5.1040, Perplexity: 164.6733, Time: 616.1747
+Epoch [2/5], Step [800/1251], Loss: 5.1179, Perplexity: 166.9823, Time: 625.7418
+Epoch [2/5], Step [850/1251], Loss: 5.1992, Perplexity: 181.1283, Time: 635.2787
+Epoch [2/5], Step [900/1251], Loss: 5.1395, Perplexity: 170.6302, Time: 644.9614
+Epoch [2/5], Step [950/1251], Loss: 5.4454, Perplexity: 231.6788, Time: 654.5609
+Epoch [2/5], Step [1000/1251], Loss: 5.1602, Perplexity: 174.1956, Time: 664.3382
+Epoch [2/5], Step [1050/1251], Loss: 5.2194, Perplexity: 184.8215, Time: 674.1164
+Epoch [2/5], Step [1100/1251], Loss: 5.2153, Perplexity: 184.0752, Time: 683.6992
+Epoch [2/5], Step [1150/1251], Loss: 5.2820, Perplexity: 196.7655, Time: 693.3416
+Epoch [2/5], Step [1200/1251], Loss: 5.0836, Perplexity: 161.3610, Time: 703.1072
+Epoch [2/5], Step [1250/1251], Loss: 5.4299, Perplexity: 228.1316, Time: 712.7650
+Epoch [3/5], Step [0/1251], Loss: 5.1679, Perplexity: 175.5533, Time: 713.2698
+Epoch [3/5], Step [50/1251], Loss: 5.2863, Perplexity: 197.6110, Time: 722.9230
+Epoch [3/5], Step [100/1251], Loss: 4.9779, Perplexity: 145.1696, Time: 732.6383
+Epoch [3/5], Step [150/1251], Loss: 5.2726, Perplexity: 194.9159, Time: 742.4210
+Epoch [3/5], Step [200/1251], Loss: 5.3685, Perplexity: 214.5341, Time: 752.3225
+Epoch [3/5], Step [250/1251], Loss: 5.2101, Perplexity: 183.1079, Time: 762.1057
+Epoch [3/5], Step [300/1251], Loss: 5.1397, Perplexity: 170.6573, Time: 771.8024
+Epoch [3/5], Step [350/1251], Loss: 4.9619, Perplexity: 142.8582, Time: 781.4823
+Epoch [3/5], Step [400/1251], Loss: 5.2674, Perplexity: 193.9099, Time: 791.0872
+Epoch [3/5], Step [450/1251], Loss: 5.1105, Perplexity: 165.7498, Time: 800.8300
+Epoch [3/5], Step [500/1251], Loss: 5.0392, Perplexity: 154.3519, Time: 810.5447
+Epoch [3/5], Step [550/1251], Loss: 5.0855, Perplexity: 161.6673, Time: 820.1676
+Epoch [3/5], Step [600/1251], Loss: 5.3202, Perplexity: 204.4243, Time: 829.8470
+Epoch [3/5], Step [650/1251], Loss: 5.3336, Perplexity: 207.1817, Time: 839.5774
+Epoch [3/5], Step [700/1251], Loss: 5.1411, Perplexity: 170.8952, Time: 849.2654
+Epoch [3/5], Step [750/1251], Loss: 5.0228, Perplexity: 151.8415, Time: 858.9031
+Epoch [3/5], Step [800/1251], Loss: 4.9955, Perplexity: 147.7446, Time: 868.4950
+Epoch [3/5], Step [850/1251], Loss: 5.3344, Perplexity: 207.3530, Time: 878.2194
+Epoch [3/5], Step [900/1251], Loss: 5.1256, Perplexity: 168.2770, Time: 887.8847
+Epoch [3/5], Step [950/1251], Loss: 5.1169, Perplexity: 166.8198, Time: 897.6299
+Epoch [3/5], Step [1000/1251], Loss: 5.2337, Perplexity: 187.4896, Time: 907.2759
+Epoch [3/5], Step [1050/1251], Loss: 5.2164, Perplexity: 184.2786, Time: 916.8990
+Epoch [3/5], Step [1100/1251], Loss: 5.2066, Perplexity: 182.4730, Time: 926.4689
+Epoch [3/5], Step [1150/1251], Loss: 5.2762, Perplexity: 195.6267, Time: 936.1546
+Epoch [3/5], Step [1200/1251], Loss: 5.3024, Perplexity: 200.8127, Time: 945.9628
+Epoch [3/5], Step [1250/1251], Loss: 5.0254, Perplexity: 152.2344, Time: 955.5572
+Epoch [4/5], Step [0/1251], Loss: 5.2390, Perplexity: 188.4813, Time: 956.0662
+Epoch [4/5], Step [50/1251], Loss: 5.0672, Perplexity: 158.7327, Time: 965.5692
+Epoch [4/5], Step [100/1251], Loss: 5.1054, Perplexity: 164.9055, Time: 975.2948
+Epoch [4/5], Step [150/1251], Loss: 5.2427, Perplexity: 189.1739, Time: 985.0315
+Epoch [4/5], Step [200/1251], Loss: 5.0630, Perplexity: 158.0644, Time: 994.7241
+Epoch [4/5], Step [250/1251], Loss: 5.3098, Perplexity: 202.3109, Time: 1004.4141
+Epoch [4/5], Step [300/1251], Loss: 5.1707, Perplexity: 176.0372, Time: 1014.0636
+Epoch [4/5], Step [350/1251], Loss: 5.0836, Perplexity: 161.3576, Time: 1023.7615
+Epoch [4/5], Step [400/1251], Loss: 5.0497, Perplexity: 155.9781, Time: 1033.4653
+Epoch [4/5], Step [450/1251], Loss: 5.3415, Perplexity: 208.8278, Time: 1043.1562
+Epoch [4/5], Step [500/1251], Loss: 5.1410, Perplexity: 170.8845, Time: 1052.7966
+Epoch [4/5], Step [550/1251], Loss: 5.0939, Perplexity: 163.0197, Time: 1062.4309
+Epoch [4/5], Step [600/1251], Loss: 5.0717, Perplexity: 159.4408, Time: 1072.1006
+Epoch [4/5], Step [650/1251], Loss: 5.1804, Perplexity: 177.7492, Time: 1081.7896
+Epoch [4/5], Step [700/1251], Loss: 5.2897, Perplexity: 198.2777, Time: 1091.4966
+Epoch [4/5], Step [750/1251], Loss: 5.3070, Perplexity: 201.7429, Time: 1101.1015
+Epoch [4/5], Step [800/1251], Loss: 5.0705, Perplexity: 159.2530, Time: 1110.7253
+Epoch [4/5], Step [850/1251], Loss: 4.9392, Perplexity: 139.6625, Time: 1120.3869
+Epoch [4/5], Step [900/1251], Loss: 4.8759, Perplexity: 131.0967, Time: 1130.1183
+Epoch [4/5], Step [950/1251], Loss: 5.4046, Perplexity: 222.4375, Time: 1139.8350
+Epoch [4/5], Step [1000/1251], Loss: 5.1086, Perplexity: 165.4347, Time: 1149.5675
+Epoch [4/5], Step [1050/1251], Loss: 5.1192, Perplexity: 167.2077, Time: 1159.2319
+Epoch [4/5], Step [1100/1251], Loss: 4.9811, Perplexity: 145.6364, Time: 1168.7835
+Epoch [4/5], Step [1150/1251], Loss: 5.3036, Perplexity: 201.0623, Time: 1178.4265
+Epoch [4/5], Step [1200/1251], Loss: 5.1313, Perplexity: 169.2346, Time: 1188.1787
+train_att.py:121: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
+Epoch [4/5], Step [1250/1251], Loss: 5.2339, Perplexity: 187.5230, Time: 1197.7747
+saving final model
+1250 - loss: 5.2339 - time: 1197.7773
+
 Namespace(batch_size=25, caption_path='./coco/annotations/sm_captions_train2014.json', crop_size=224, embed_size=512, hidden_size=512, image_dir='./data/resized2014', learning_rate=0.001, log_step=100, model_path='./models/ATT', num_epochs=40, num_layers=1, num_workers=2, save_step=10, vocab_path='./data/vocab.pkl')
 loading annotations into memory...
 0:00:00.111650
