@@ -4,7 +4,7 @@ loading annotations into memory...
 creating index...
 index created!
 ----- DATA_LOADER -- loaded data ----
-emb_size(M):  256 hid_size(H):  512 voc_size(V):  9956 L:  49 D:  2048 num_layers:
+
 ---- USING GPU ----
 
 train_att.py:24: UserWarning: volatile was removed and now has no effect. Use `with torch.no_grad():` instead.
