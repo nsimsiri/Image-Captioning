@@ -84,6 +84,11 @@ def main(args):
             # loss = criterion(outputs, targets);
             loss = compute_loss(outputs, captions, lengths) #targets
             loss.backward()
+            # for name, param in decoder.named_parameters():
+            #     if param.requires_grad and name == 'h0':
+            #         print name, param.data
+            #     if param.requires_grad and name == 'c0':
+            #         print name, param.data
             optimizer.step()
             # Print log info
             '''print
