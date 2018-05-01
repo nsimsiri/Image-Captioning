@@ -20,7 +20,7 @@ import pickle
 ATT_HID = 512;
 ATT_EMB = 512;
 GENCAP_DIR = './gen_caps/ATT.pkl'
-XODER_PATH = './models/ATT/B/'
+XODER_PATH = './models/ATT/C/'
 dataDir='./coco'
 mypath = "./data/val_resized2014"
 # mypath = "./data/resized2014"

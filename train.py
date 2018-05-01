@@ -85,17 +85,6 @@ def main(args):
             encoder.zero_grad()
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
-            sampled_ids = decoder.sample(images);
-            sampled_ids = sampled_ids.cpu().data.numpy()
-
-            # Decode word_ids to words
-            sampled_caption = []
-            for word_id in sampled_ids:
-                word = vocab.idx2word[word_id]
-                sampled_caption.append(word)
-                if word == '<end>':
-                    break
-            sentence = ' '.join(sampled_caption)
             loss = criterion(outputs, targets) #targets
             loss.backward()
             optimizer.step()
