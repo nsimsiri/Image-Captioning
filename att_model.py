@@ -113,7 +113,8 @@ class DecoderRNN(nn.Module):
         self._affine_decode_h = nn.Linear(self.H, self.M);
         self._affine_decode_ctx = nn.Linear(self.D, self.M);
         self._affine_decoder_out = nn.Linear(self.M, self.V);
-
+        self.h0 = nn.Parameter(torch.zeros(self.N, self.H), requires_grad=True);
+        # self.word_lstm_init_h = Parameter(torch.randn(2, 20, word_lstm_dim).type(FloatTensor), requires_grad=True)
         self.init_weights();
         self.hidden_size = hidden_size;
         self.embed_size = embed_size;
@@ -214,7 +215,7 @@ class DecoderRNN(nn.Module):
         embeddings = self.embed(captions) # = (N, M)
         # next_h, next_c = self.affine_lstm_init(features); # (N,H)
         # next_h = self.DEBUG_feat(features);
-        next_h = to_var(Variable(torch.zeros(N, self.H)));
+        next_h = self.h0#to_var(Variable(torch.zeros(N, self.H)));
         next_c = to_var(Variable(torch.zeros(N, self.H)));
         alphas = [];
         h_list = []
@@ -241,10 +242,10 @@ class DecoderRNN(nn.Module):
         <end>': 2
         '''
         N = features.shape[0];
-        inputs = features.unsqueeze(0)
+        # inputs = features.unsqueeze(0)
         sampled_ids = []
         # start = torch.cuda.LongTensor([1]*N).cuda();
-        embedding_i = inputs;#self.embed(start);
+        embedding_i = features;#self.embed(start);
         next_h = to_var(Variable(torch.zeros(1, self.H)));
         next_c = to_var(Variable(torch.zeros(1, self.H)));
         for i in range(20):

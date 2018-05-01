@@ -77,39 +77,16 @@ def main(args):
             # Forward, Backward and Optimize
             decoder.zero_grad()
             encoder.zero_grad()
-
-            print 'images.shape', images.shape
             projected_features, features = encoder(images)
-            print 'features',features.shape;
             outputs = decoder(projected_features, features, captions, lengths)
-
-            print 'images',images[0].shape;
-            print 'images2',images[0].unsqueeze(0).shape;
-            print 'features', features[0].unsqueeze(0).shape;
-
-            ''' unrolled debug
-            sampled_ids = decoder.sample(features[0]);
-            sampled_ids = sampled_ids.cpu().data.numpy()
-
-            # Decode word_ids to words
-            sampled_caption = []
-            for word_id in sampled_ids:
-                word = vocab.idx2word[word_id]
-                sampled_caption.append(word)
-                if word == '<end>':
-                    break
-            sentence = ' '.join(sampled_caption)
-            print sentence;
-            sys.exit();
-            '''
-            lengths = torch.cuda.LongTensor(lengths);
-            # lengths = torch.LongTensor(lengths);
+            # lengths = torch.cuda.LongTensor(lengths);
+            lengths = torch.LongTensor(lengths);
             # loss = criterion(outputs, targets);
             loss = compute_loss(outputs, captions, lengths) #targets
             loss.backward()
             optimizer.step()
             # Print log info
-            '''
+            '''print
             projected_features, features = encoder(images[0].unsqueeze(0));
             sampled_ids = decoder.sample(projected_features, features);
             sampled_caption = []

@@ -30,7 +30,6 @@ def compute_loss(logits, target, length):
     Returns:
         loss: An average loss value masked by the length.
     """
-
     # logits_flat: (batch * max_len, num_classes)
     logits_flat = logits.view(-1, logits.size(-1))
     # log_probs_flat: (batch * max_len, num_classes)
