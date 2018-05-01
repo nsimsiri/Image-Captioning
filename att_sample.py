@@ -63,7 +63,8 @@ def main(args, show_img=False):
 
     # Generate caption from image
     projected_feature, feature = encoder(image_tensor)
-    sampled_ids = decoder.sample(projected_feature, feature)
+    # sampled_ids = decoder.sample(projected_feature, feature)
+    sampled_ids = decoder.sample(feature)
     sampled_ids = sampled_ids.cpu().data.numpy()
 
     # Decode word_ids to words

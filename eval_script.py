@@ -18,7 +18,7 @@ import copy;
 import pickle
 
 ATT_HID = 512;
-ATT_EMB = 512;
+ATT_EMB = 256;
 GENCAP_DIR = './gen_caps/ATT.pkl'
 XODER_PATH = './models/ATT/C/'
 dataDir='./coco'
