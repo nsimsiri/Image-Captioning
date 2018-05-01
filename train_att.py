@@ -84,11 +84,7 @@ def main(args):
             # loss = criterion(outputs, targets);
             loss = compute_loss(outputs, captions, lengths) #targets
             loss.backward()
-            # for name, param in decoder.named_parameters():
-            #     if param.requires_grad and name == 'h0':
-            #         print name, param.data
-            #     if param.requires_grad and name == 'c0':
-            #         print name, param.data
+
             optimizer.step()
             # Print log info
             '''print
@@ -110,6 +106,11 @@ def main(args):
                 print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
                       %(epoch, args.num_epochs, i, total_step,
                         loss.data[0], np.exp(loss.data[0]), time.time()-t0))
+                for name, param in decoder.named_parameters():
+                    if param.requires_grad and name == 'h0':
+                        print name, param.data
+                    if param.requires_grad and name == 'c0':
+                        print name, param.data
             # else:
             #     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
 
