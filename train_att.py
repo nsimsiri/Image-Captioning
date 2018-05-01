@@ -79,8 +79,8 @@ def main(args):
             encoder.zero_grad()
             projected_features, features = encoder(images)
             outputs = decoder(projected_features, features, captions, lengths)
-            # lengths = torch.cuda.LongTensor(lengths);
-            lengths = torch.LongTensor(lengths);
+            lengths = torch.cuda.LongTensor(lengths);
+            # lengths = torch.LongTensor(lengths);
             # loss = criterion(outputs, targets);
             loss = compute_loss(outputs, captions, lengths) #targets
             loss.backward()
