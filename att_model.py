@@ -114,6 +114,7 @@ class DecoderRNN(nn.Module):
         self._affine_decode_ctx = nn.Linear(self.D, self.M);
         self._affine_decoder_out = nn.Linear(self.M, self.V);
         self.h0 = nn.Parameter(torch.zeros(self.N, self.H), requires_grad=True);
+        self.c0 = nn.Parameter(torch.zeros(self.N, self.H), requires_grad=True);
         # self.word_lstm_init_h = Parameter(torch.randn(2, 20, word_lstm_dim).type(FloatTensor), requires_grad=True)
         self.init_weights();
         self.hidden_size = hidden_size;
@@ -215,8 +216,8 @@ class DecoderRNN(nn.Module):
         embeddings = self.embed(captions) # = (N, M)
         # next_h, next_c = self.affine_lstm_init(features); # (N,H)
         # next_h = self.DEBUG_feat(features);
-        next_h = None#to_var(Variable(torch.zeros(N, self.H)));
-        next_c = None#to_var(Variable(torch.zeros(N, self.H)));
+        next_h = self.h0#to_var(Variable(torch.zeros(N, self.H)));
+        next_c = self.c0#to_var(Variable(torch.zeros(N, self.H)));
         alphas = [];
         h_list = []
         y_i = to_var(Variable(torch.zeros(N, self.V)));
