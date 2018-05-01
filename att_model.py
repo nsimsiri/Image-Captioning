@@ -215,8 +215,8 @@ class DecoderRNN(nn.Module):
         embeddings = self.embed(captions) # = (N, M)
         # next_h, next_c = self.affine_lstm_init(features); # (N,H)
         # next_h = self.DEBUG_feat(features);
-        next_h = self.h0#to_var(Variable(torch.zeros(N, self.H)));
-        next_c = to_var(Variable(torch.zeros(N, self.H)));
+        next_h = None#to_var(Variable(torch.zeros(N, self.H)));
+        next_c = None#to_var(Variable(torch.zeros(N, self.H)));
         alphas = [];
         h_list = []
         y_i = to_var(Variable(torch.zeros(N, self.V)));
