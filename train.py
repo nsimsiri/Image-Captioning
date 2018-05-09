@@ -26,7 +26,21 @@ def name_pretrained_sizes(nl, emb, hid, xoder, epoch, i): return '%d_%d_%d_%s-%d
 def name_pretrained_lr(lr_mag, xoder, epoch, i):
     s = str(lr_mag).replace('.','');
     return 'learning_%s_%s-%d-%d.pkl' %(s,xoder, epoch+1, i+1)
-
+def print_outputs(captions_out, outputs, vocab):
+    N = captions_out.size(0)
+    print N;
+    print 'Gold---'
+    for i in range(N):
+        caption = captions_out[i]
+        output = outputs[i];
+        print vocab.idx2word[int(caption)],
+    print '\nPredicted---'
+    for i in range(N):
+        output = outputs[i];
+        val, idx = torch.max(output, 0);
+        idx = int(idx);
+        print vocab.idx2word[idx],
+    print '';
 def main(args):
     # Create model directory
     if not os.path.exists(args.model_path):
@@ -86,11 +100,13 @@ def main(args):
             features = encoder(images)
             outputs = decoder(features, captions, lengths)
             loss = criterion(outputs, targets) #targets
+
             loss.backward()
             optimizer.step()
             # Print log info
 
             if i % args.log_step == 0:
+                print_outputs(targets.data, outputs.data, vocab);
                 print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
                       %(epoch, args.num_epochs, i, total_step,
                         loss.data[0], np.exp(loss.data[0]), time.time()-t0))

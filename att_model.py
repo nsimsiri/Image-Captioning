@@ -100,7 +100,7 @@ class DecoderRNN(nn.Module):
         print 'emb_size(M): ',embed_size, 'hid_size(H): ',hidden_size, \
         'voc_size(V): ',vocab_size, 'L: ', self.L, 'D: ', self.D, 'num_layers: '
         self.embed = nn.Embedding(self.V, self.M)
-        self.lstm = nn.LSTM(self.M, self.H, num_layers, batch_first=True)
+        # self.lstm = nn.LSTM(self.M, self.H, num_layers, batch_first=True)
         self.linear = nn.Linear(self.H, self.V)
         # encode feature
         self._affine_lstm_init_h = nn.Linear(self.D, self.H);
@@ -219,15 +219,14 @@ class DecoderRNN(nn.Module):
         print 'features', features.shape;
         embeddings = self.embed(captions) # = (N, M)
         print 'embeddings', embeddings.shape;
-        next_h = to_var(torch.zeros(N, self.H));
+        # next_h = to_var(torch.zeros(N, self.H));
         next_c = to_var(torch.zeros(N, self.H));
         next_h = features;
         alphas = [];
         h_list = []
         # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1);
         print 'embeddings2', embeddings.shape;
-        print 'next_h', next_h;
-        sys.exit()
+        print 'next_h', next_h.shape;
         for i in range(0,T):
             embedding_i = embeddings[:,i,:]
             next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));

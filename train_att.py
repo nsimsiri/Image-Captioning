@@ -24,7 +24,19 @@ def to_var(x, volatile=False):
     return Variable(x, volatile=volatile)
 
 def name_pretrained_sizes(nl, emb, hid, xoder, epoch, i): return '%d_%d_%d_%s-%d-%d.pkl' %(nl, emb, hid, xoder, epoch+1, i+1)
-
+def print_outputs(captions_out, outputs, vocab):
+    N, T = captions_out.size()
+    for i in range(N):
+        caption = captions_out[i]
+        output = outputs[i];
+        for j in range(T):
+            print vocab.idx2word[int(caption[j])],
+        print ''
+        for j in range(T):
+            val, idx = torch.max(output[j], 0);
+            idx = int(idx);
+            print vocab.idx2word[idx],
+        print '';
 def main(args):
     # Create model directory
     if not os.path.exists(args.model_path):
@@ -64,9 +76,6 @@ def main(args):
     params = list(decoder.parameters()) + \
              list(encoder.linear.parameters()) + \
              list(encoder.bn.parameters())
-    for k,v in decoder.parameters().iteritems():
-        print k
-    sys.exit()
     optimizer = torch.optim.Adam(params, lr=args.learning_rate)
 
     # Train the Models
@@ -80,22 +89,29 @@ def main(args):
             if args.batch_size!=N: continue;
             images = to_var(images, volatile=True)
             captions = to_var(captions)
-            targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
-            targets2 = captions.view((captions.shape[0]*captions.shape[1], ));
+            # targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
+            # targets2 = captions.view((captions.shape[0]*captions.shape[1], ));
+            captions_out = captions[:, 1:];
+            captions_in = captions[:, :-1];
             # Forward, Backward and Optimize
             decoder.zero_grad()
             encoder.zero_grad();
 
             projected_features, features = encoder(images)
-            outputs = decoder(projected_features, features, captions, lengths)
+            outputs = decoder(projected_features, features, captions_in, lengths)
 
             # lengths = torch.cuda.LongTensor(lengths);
-            lengths = torch.LongTensor(lengths);
+            lengths = torch.LongTensor(lengths)-1;
             # loss = criterion(outputs, targets);
-            loss = compute_loss(outputs, captions, lengths) #targets
+            print lengths;
+            print captions_out.shape;
+            print outputs.shape;
+            print_outputs(captions_out, outputs, vocab);
+            loss = compute_loss(outputs, captions_output, lengths) #targets
             loss.backward()
             optimizer.step()
-            sys.exit()
+            sys.exit();
+
             # Print log info
             '''print
             projected_features, features = encoder(images[0].unsqueeze(0));
