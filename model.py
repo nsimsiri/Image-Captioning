@@ -47,15 +47,15 @@ class DecoderRNN(nn.Module):
 
     def forward(self, features, captions, lengths):
         """Decode image feature vectors and generates captions."""
+        for name, param in self.lstm.named_parameters():
+                print name
         embeddings = self.embed(captions)
         embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)
         packed = pack_padded_sequence(embeddings, lengths, batch_first=True)
-        print 'embedding', embeddings.shape;
-        print 'pack', packed[0].shape
-
-        sys.exit()
         hiddens, _ = self.lstm(packed)
+        print 'hmm', hiddens[0].shape
         outputs = self.linear(hiddens[0])
+        print 'outputs',outputs.shape;
         return outputs
 
     def sample(self, features, states=None):

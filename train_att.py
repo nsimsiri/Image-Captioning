@@ -16,6 +16,7 @@ import json;
 import sys;
 import time;
 #
+PAD, START, END = (0,1,2);
 NAME = 'DEBUG'
 def to_var(x, volatile=False):
     if torch.cuda.is_available():
@@ -49,7 +50,7 @@ def main(args):
 
     print '----- DATA_LOADER -- loaded data ----'
     # Build the models
-    encoder = EncoderCNN(args.embed_size)
+    encoder = EncoderCNN(args.hidden_size)
     decoder = DecoderRNN(args.embed_size, args.hidden_size, len(vocab), args.num_layers, batch_size=args.batch_size)
 
     if torch.cuda.is_available():
@@ -59,7 +60,13 @@ def main(args):
 
     # Loss and Optimizer
     criterion = nn.CrossEntropyLoss()
-    params = list(decoder.parameters()) + list(encoder.linear.parameters()) + list(encoder.bn.parameters())
+
+    params = list(decoder.parameters()) + \
+             list(encoder.linear.parameters()) + \
+             list(encoder.bn.parameters())
+    for k,v in decoder.parameters().iteritems():
+        print k
+    sys.exit()
     optimizer = torch.optim.Adam(params, lr=args.learning_rate)
 
     # Train the Models
@@ -70,22 +77,25 @@ def main(args):
         for i, (images, captions, lengths) in enumerate(data_loader):
             # Set mini-batch dataset
             N, T = captions.shape;
+            if args.batch_size!=N: continue;
             images = to_var(images, volatile=True)
             captions = to_var(captions)
             targets = pack_padded_sequence(captions, lengths, batch_first=True)[0]
             targets2 = captions.view((captions.shape[0]*captions.shape[1], ));
             # Forward, Backward and Optimize
             decoder.zero_grad()
-            encoder.zero_grad()
+            encoder.zero_grad();
+
             projected_features, features = encoder(images)
             outputs = decoder(projected_features, features, captions, lengths)
-            lengths = torch.cuda.LongTensor(lengths);
-            # lengths = torch.LongTensor(lengths);
+
+            # lengths = torch.cuda.LongTensor(lengths);
+            lengths = torch.LongTensor(lengths);
             # loss = criterion(outputs, targets);
             loss = compute_loss(outputs, captions, lengths) #targets
             loss.backward()
-
             optimizer.step()
+            sys.exit()
             # Print log info
             '''print
             projected_features, features = encoder(images[0].unsqueeze(0));
@@ -106,11 +116,11 @@ def main(args):
                 print('Epoch [%d/%d], Step [%d/%d], Loss: %.4f, Perplexity: %5.4f, Time: %.4f'
                       %(epoch, args.num_epochs, i, total_step,
                         loss.data[0], np.exp(loss.data[0]), time.time()-t0))
-                for name, param in decoder.named_parameters():
-                    if param.requires_grad and name == 'h0':
-                        print name, param.data
-                    if param.requires_grad and name == 'c0':
-                        print name, param.data
+                # for name, param in decoder.named_parameters():
+                #     if param.requires_grad and name == 'h0':
+                #         print name, param.data
+                #     if param.requires_grad and name == 'c0':
+                #         print name, param.data
             # else:
             #     print '%s - loss: %.4f - time: %.4f'%(i, loss.data[0], time.time()-t0);
 

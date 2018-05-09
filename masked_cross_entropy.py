@@ -42,6 +42,7 @@ def compute_loss(logits, target, length):
     losses = losses_flat.view(*target.size())
     # mask: (batch, max_len)
     mask = _sequence_mask(sequence_length=length, max_len=target.size(1))
+    print mask;
     losses = losses * mask.float()
     loss = losses.sum() / length.float().sum()
     return loss

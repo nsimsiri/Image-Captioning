@@ -8,7 +8,6 @@ import numpy as np;
 from OldModel import *;
 import sys;
 
-PAD, START, END = (0,1,2);
 RESNET_SHAPE = (2048, 7, 7)
 RESNET_LAYER = -2
 MAX_T = 50;
@@ -67,7 +66,6 @@ class EncoderCNN(nn.Module):
         resnet = models.resnet152(pretrained=True)
         modules = list(resnet.children())[:-1]      # delete the last fc layer.
         self.resnet = nn.Sequential(*modules)
-        # self.linear = nn.Linear(resnet.fc.in_features, embed_size)
         self.linear = nn.Linear(resnet.fc.in_features, embed_size)
         self.bn = nn.BatchNorm1d(embed_size, momentum=0.01)
         self.init_weights()
@@ -95,7 +93,7 @@ class DecoderRNN(nn.Module):
         self.H =  hidden_size
         self.L = RESNET_SHAPE[1]*RESNET_SHAPE[2]; #(7 x 7)
         self.D = RESNET_SHAPE[0]; #(2048)
-        self.img_embed = nn.Linear(self.M, self.H);
+        self.DEBUG_feat = nn.Linear(self.M, self.H);
         self.batch_size = batch_size;
         print 'emb_size(M): ',embed_size, 'hid_size(H): ',hidden_size, \
         'voc_size(V): ',vocab_size, 'L: ', self.L, 'D: ', self.D, 'num_layers: '
@@ -128,8 +126,8 @@ class DecoderRNN(nn.Module):
 
     def init_weights(self):
         """Initialize weights."""
-        torch.nn.init.xavier_uniform_(self.img_embed.weight)
-        self.img_embed.bias.data.fill_(0)
+        torch.nn.init.xavier_uniform_(self.DEBUG_feat.weight)
+        self.DEBUG_feat.bias.data.fill_(0)
 
         self.embed.weight.data.uniform_(-0.1, 0.1)
         torch.nn.init.xavier_uniform_( self.linear.weight)
@@ -215,28 +213,30 @@ class DecoderRNN(nn.Module):
             features = (N, L, D) i.e (N, 49, 2048)
         """
         N, T = captions.shape;
-        print captions
-        print 'features', features.shape;
         embeddings = self.embed(captions) # = (N, M)
-        print 'embeddings', embeddings.shape;
+        # next_h, next_c = self.affine_lstm_init(features); # (N,H)
+        # next_h = self.DEBUG_feat(features);
         next_h = to_var(torch.zeros(N, self.H));
         next_c = to_var(torch.zeros(N, self.H));
-        next_h = features;
         alphas = [];
         h_list = []
-        # embeddings = torch.cat((features.unsqueeze(1), embeddings), 1);
-        print 'embeddings2', embeddings.shape;
-        print 'next_h', next_h;
-        sys.exit()
+        y_i = to_var(Variable(torch.zeros(N, self.V)));
+        embeddings = torch.cat((features.unsqueeze(1), embeddings), 1)n
         for i in range(0,T):
+        #     # ctx_vector, alpha = self.attention_layer(next_h, projected_features, features);
+            # embedding_i = torch.cat((embeddings[:,i,:], ctx_vector), 1);
             embedding_i = embeddings[:,i,:]
+        #     # expects input = (N, M), h,c = (N, H)
             next_h, next_c = self.lstm_cell(embedding_i, (next_h, next_c));
+        #     # y_i = self.attention_lstm_decode_layer(ctx_vector, next_h, y_i); #(N, V)
+            # h_list.append(y_i);
             h_list.append(next_h);
-        outputs = torch.cat(h_list);
-        print 'outputs', outputs.shape;
-        outputs2 = outputs.contiguous().view((N, T, -1));
-        outputs3 = self.linear(outputs2);
-        return outputs3;
+        outputs = torch.cat(h_list)
+        outputs = outputs.contiguous().view((N, T, -1));
+        outputs = self.linear(outputs);
+        # outputs = outputs.contiguous().view((N, T, self.V));
+        # print 'outputs',outputs.shape;
+        return outputs;
 
     def sample(self, features):
         ''''<start>': 1
