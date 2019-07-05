@@ -1,0 +1,18 @@
+config:
+    data:
+        coco:
+            root: /Users/nsimsiri/Documents/code/ml/coco
+            caption_ann: caption_annotations
+            train:
+              captions: x
+              instances: x
+              images: x
+            val:
+              images: val2014
+              captions: captions_val2014.json
+              instances: instances_val2014.json
+            test:
+              images: x
+              captions: x
+              instances: x
+              
