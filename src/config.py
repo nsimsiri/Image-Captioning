@@ -2,7 +2,6 @@ import sys, os, json
 from collections import defaultdict
 import yaml
 from yaml import CLoader as Loader
-
 from pycocotools.coco import COCO
 
 def init_configs(config_path):
