@@ -68,14 +68,12 @@ class CaptionConfig():
         image_paths = [img_obj_to_path(imgObj) for imgObj in imgObjs]
         return image_paths
 
-
     def get_coco_captions(self, split='val'):
         if (split not in ['val', 'test', 'train']):
             raise Exception("Split is invalid");
         
         return self.coco[split]['captions']
     
-
     def get_coco_instances(self, split='val'):
         if self._skip('instances'):
             raise Exception("instances is not loaded.")
