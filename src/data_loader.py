@@ -1,13 +1,17 @@
 import sys, os, json, yaml
+from collections import defaultdict
 
 import torch
 from torch.utils import data
 from torchvision import transforms
 from sklearn.model_selection import train_test_split
 
-from pycocotools.coco import Coco
+from pycocotools.coco import COCO
+import nltk
+from nltk import word_tokenize
 
 from src.config import CaptionConfig
+from src.text_processor import TextProcessor
 
 from PIL import Image
 import numpy as np
@@ -24,14 +28,20 @@ class CaptionDataset():
         self._config = CaptionConfig(config_path)
         self._shuffle = shuffle 
         self._n_splits = n_splits
-        self.n_sample
+        self.n_sample = n_sample
         self.splits = {
-            'val': None,
-            'train': None,
-            'test': None
+            'val'  : [],
+            'train': [],
+            'test' : []
         }
+        self.itow = []                    # List[index: int] -> word: str
+        self.wtoi = defaultdict(int)      # Dict[word: str -> index: int]  
+        self.data = defaultdict(dict)     # Dict[annId: int -> annotation: Dict]
 
         coco_caption =  self._config.get_coco_captions()
+        
+        self._build_splits(coco_caption)
+        del coco_caption
 
     def _get_coco_annotation_ids(self, coco_caption):
         annIds = coco_caption.getAnnIds()
@@ -40,11 +50,11 @@ class CaptionDataset():
         annIds = np.random.choice(annIds, size=self.n_sample, replace=False)
         return annIds
 
-    def _get_splits(self, coco_caption):
+    def _build_splits(self, coco_caption):
         if len(self._n_splits) != 3 or sum(self._n_splits)!=1:
             raise Exception("Splits %'s are not valid: {} (incorrect)".format(splits))
 
-        annIds = self._get_coco_annotation_ids()
+        annIds = self._get_coco_annotation_ids(coco_caption)
         n_annIds = len(annIds)
         train_percent, val_percent, test_percent = self._n_splits
         val_train_percent = val_percent + test_percent
@@ -56,12 +66,40 @@ class CaptionDataset():
         val_annIds, test_annIds =\
             train_test_split(test_annIds,\
                             train_size=float(val_percent/val_train_percent),\
-                            test_size =float(test_size/val_train_percent))
+                            test_size =float(test_percent/val_train_percent))
 
 
         self.splits['train'] = train_annIds
         self.splits['val']   = val_annIds
         self.splits['test']  = test_annIds
+
+
+    def _build_indexes(self, tokens):
+        pass
+
+    def _build_vocab(self, coco_caption):
+        for annId in self.getAnnIds():
+            ann_i =  coco_caption.loadAnns(annId)
+            self.data[annId] = ann_i
+            text = ann_i['caption']
+            text_processor = TextProcessor()
+
+            processing_text = text_processor.tokenize(text, strategy="default")
+            
+            tokens = processing_text.tokens()
+            self._build_indexes(tokens)
+            self.data[annId]['tokens'] = tokens
+
+
+        
+    def getAnnIds(self, generate=True):
+        split_keys = ['train', 'val', 'test']
+        if not generate:
+            return [e for e in [self.splits[k] for k in split_keys]]
+
+        for k in split_keys:
+            for e in self.splits[k]:
+                yield e
 
     def __len__(self):
         return self.n_sample
