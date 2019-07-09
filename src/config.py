@@ -58,15 +58,16 @@ class CaptionConfig():
         
         coco_obj = self.coco[split][data_type] 
         imgObjs =  coco_obj.loadImgs(imgIds)
-        image_folder_path = self.get_images_folder_path(split=split)
-
-        def img_obj_to_path(img_obj):
-            imgName = img_obj['file_name']
-            _path = os.path.join(image_folder_path, imgName)
-            return _path
-
-        image_paths = [img_obj_to_path(imgObj) for imgObj in imgObjs]
+        
+        image_paths = [self.img_obj_to_path(imgObj, split=split) for imgObj in imgObjs]
         return image_paths
+    
+    def img_obj_to_path(self, img_obj, folder_split="val"):
+        imgName = img_obj['file_name']
+        image_folder_path = self.get_images_folder_path(split=folder_split)
+        _path = os.path.join(image_folder_path, imgName)
+        return _path
+
 
     def get_coco_captions(self, split='val'):
         if (split not in ['val', 'test', 'train']):

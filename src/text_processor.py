@@ -17,7 +17,7 @@ class ProcessingText():
 class TextProcessor():
     def __init__(self):
         self.strategy_map = {
-            'default': self._default_tokenize
+            'default': TextProcessor._default_tokenize
         }
     
     def add_strategy(self, strategy_name, strategy):
@@ -26,6 +26,7 @@ class TextProcessor():
 
         self.strategy_map[strategy_name] = strategy
 
+    @staticmethod
     def _default_tokenize(sentence):
         tokens = word_tokenize(sentence)
         return tokens
