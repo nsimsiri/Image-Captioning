@@ -21,8 +21,9 @@ class CaptionConfig():
         coco_yml = config_yml['config']['data']['coco']
         self.filters = filters
         self.data_path = defaultdict(dict)
-        self.coco = defaultdict(dict)
-
+        self._coco = defaultdict(dict)
+        self._is_coco_deleted = False
+        
         for split in ['val', 'train', 'test']:
             for data_type in ['images', 'captions', 'instances']:
                 _path = None
@@ -40,7 +41,7 @@ class CaptionConfig():
                 for data_type in ['captions' ,'instances']:
                     if self._skip(data_type): 
                         continue
-                    self.coco[split][data_type] = COCO(self.data_path[split][data_type])
+                    self._coco[split][data_type] = COCO(self.data_path[split][data_type])
                     print("loaded - {} {}".format(split, data_type))
     
     def _skip(self, e):
@@ -55,30 +56,41 @@ class CaptionConfig():
     def get_image_path(self, imgIds, split='val', data_type='captions'):
         if split not in ['val', 'test', 'train']:
             raise Exception("Split is invalid")
-        
-        coco_obj = self.coco[split][data_type] 
+        coco = self.get_coco()
+        coco_obj = coco[split][data_type] 
         imgObjs =  coco_obj.loadImgs(imgIds)
         
-        image_paths = [self.img_obj_to_path(imgObj, split=split) for imgObj in imgObjs]
+        image_paths = [self.img_obj_to_path(imgObj, folder_split=split) for imgObj in imgObjs]
         return image_paths
     
-    def img_obj_to_path(self, img_obj, folder_split="val"):
+    def get_image_path_from_object(self, img_obj, folder_split="val"):
         imgName = img_obj['file_name']
         image_folder_path = self.get_images_folder_path(split=folder_split)
         _path = os.path.join(image_folder_path, imgName)
+        if not os.path.exists(_path):
+            raise ValueError("ERR: cannot find image \'{}\'".format(_path))
+                
         return _path
-
 
     def get_coco_captions(self, split='val'):
         if (split not in ['val', 'test', 'train']):
             raise Exception("Split is invalid");
-        
-        return self.coco[split]['captions']
+        coco = self.get_coco()
+        return coco[split]['captions']
     
     def get_coco_instances(self, split='val'):
         if self._skip('instances'):
             raise Exception("instances is not loaded.")
         if (split not in ['val', 'test', 'train']):
             raise Exception("Split is invalid");
-        
-        return self.coco[split]['instances']
+        coco = self.get_coco()
+        return coco[split]['instances']
+    
+    def delete_coco(self):
+        self._is_coco_deleted = True
+        del self._coco
+    
+    def get_coco(self):
+        if self._is_coco_deleted:
+            raise Exception("COCO object has been removed from memory")
+        return self._coco
