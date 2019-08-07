@@ -21,21 +21,24 @@ import numpy as np
 
 SPECIAL_TOKENS = ["<pad>", "<unk>", "<start>", "<end>"]
 
-def collate_caption_fn(batch):
-    batch = sorted(batch, key=lambda e: e[-1])
-    annIds       = [e[0] for e in batch]
-    imgs         = [e[1] for e in batch]
-    captions     = [e[2] for e in batch]
-    caption_lens = [e[-1] for e in batch]
+def collate_caption_fn(wtoi):
+    def _collate_caption_fn(batch):
+        batch = sorted(batch, key=lambda e: e[-1], reverse=True)
+        caption_lens = torch.LongTensor([e[-1] for e in batch])
+        pad_idx = wtoi['<pad>']
+        max_caption_len = max(caption_lens)
+        annIds       = torch.LongTensor([e[0] for e in batch])
+        imgs         = torch.stack([e[1] for e in batch])
+        captions     = torch.LongTensor([e[2] + [pad_idx for i in range(max_caption_len - len(e[2]))] for e in batch])
+        return annIds, imgs, captions, caption_lens
 
-    return annIds, imgs, captions, caption_lens
+    return _collate_caption_fn
     
 class CaptionDataManager():
     def __init__(self, config_path, 
                  n_sample=500, 
                  shuffle=True, 
-                 n_splits=[0.8, 0.1, 0.1],
-                 image_transform = default_image_transform):
+                 n_splits=[0.8, 0.1, 0.1]):
 
         if n_sample < 0:
             raise Exception("n_samples invalid: {} (incorrect)".format(n_sample))
@@ -44,7 +47,6 @@ class CaptionDataManager():
         self._shuffle = shuffle 
         self._n_splits = n_splits
         self.n_sample = n_sample
-        self.image_transform = image_transform
         self.splits = {
             'val'  : [],
             'train': [],
@@ -61,6 +63,7 @@ class CaptionDataManager():
         self._build_vocab(coco_caption)
         
         self._config.delete_coco()
+        print("Loaded {} samples", self.n_sample)
         del coco_caption
 
     def _get_coco_annotation_ids(self, coco_caption):
@@ -140,6 +143,18 @@ class CaptionDataManager():
         except:
             raise Exception("cannot find some encoding for {}".format(tokens))
 
+    
+    def decode_tokens(self, encoding, length = 0):
+        tokens = []
+        for i, encodingIdx in enumerate(encoding):
+            encodingIdx = int(encodingIdx)
+            if encodingIdx >= len(self.itow) or encodingIdx < 0:
+                raise ValueError("no such token \'{}\' in vocabulary".format(encodingIdx))
+            tokens.append(self.itow[encodingIdx])
+            if length > 0 and i >= len(encoding):
+                break
+        return " ".join(tokens)
+
     def vocab(self):
         return self.wtoi.keys() 
     
@@ -194,21 +209,24 @@ class CaptionDataManager():
                          split_type, 
                          batch_size=50, 
                          shuffle=False,
-                         collate_fn=collate_caption_fn):        
-        dataset = CaptionDataset(self, split_type)
+                         collate_fn=collate_caption_fn,
+                         image_transform=default_image_transform):        
+        dataset = CaptionDataset(self, split_type, image_transform=image_transform)
         dataloader = data.DataLoader(dataset, batch_size=batch_size, 
-                        shuffle=shuffle, collate_fn=collate_caption_fn)
+                shuffle=shuffle, collate_fn=collate_caption_fn(self.wtoi))
+
         return dataloader
                     
 ''' 
 CaptionDataset 
 '''
 class CaptionDataset(data.Dataset):
-    def __init__(self, data_manager, split_type):
+    def __init__(self, data_manager, split_type, image_transform=default_image_transform):
         if split_type not in data_manager.splits.keys():
             raise ValueError(("split_type argument must be one of" +
                     "(train, val, test), received {} instead.").format(split_type))
         
+        self._image_transform = image_transform
         self._split_type = split_type
         self._data_manager = data_manager
         self.annIds = data_manager.getAnnIds(split_type=split_type, generate=False)
@@ -223,7 +241,7 @@ class CaptionDataset(data.Dataset):
         annId = self.annIds[idx]
         ann_i = self._data_manager.load_ann(annId)
         image = self._data_manager.load_image(ann_i['image_id'])
-        image = self._data_manager.image_transform(image)
+        image = self._image_transform(image)
         caption = ann_i['encoding']
         caption_length = len(caption)
         return annId, image, caption, caption_length

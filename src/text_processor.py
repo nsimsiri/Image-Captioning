@@ -29,6 +29,7 @@ class TextProcessor():
     @staticmethod
     def _default_tokenize(sentence):
         tokens = word_tokenize(sentence)
+        tokens = [token.lower() for token in tokens]
         return tokens
 
     def tokenize(self, text, strategy="default"):

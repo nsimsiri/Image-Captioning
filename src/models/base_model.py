@@ -7,7 +7,7 @@ import sys;
 
 class Encoder(nn.Module):
     def __init__(self, embed_size):
-        super(EncoderCNN, self).__init__()
+        super(Encoder, self).__init__()
         resnet = models.resnet152(pretrained=True)
         modules = list(resnet.children())[:-1] 
         self.resnet = nn.Sequential(*modules)
@@ -26,10 +26,9 @@ class Encoder(nn.Module):
         features = self.bn(self.linear(features))
         return features
 
-
 class Decoder(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, num_layers):
-        super(DecoderRNN, self).__init__()
+        super(Decoder, self).__init__()
         self.embed = nn.Embedding(vocab_size, embed_size)
         self.lstm = nn.LSTM(embed_size, hidden_size, num_layers, batch_first=True)
         self.linear = nn.Linear(hidden_size, vocab_size)
@@ -48,21 +47,51 @@ class Decoder(nn.Module):
         outputs = self.linear(hiddens[0])
         return outputs
 
-    def sample(self, features, states=None):
+    def sample(self, features, manager, states=None):
         sampled_ids = []
         inputs = features.unsqueeze(1)
+        print('image', inputs.shape)
         for i in range(20):                                      # maximum sampling length
             hiddens, states = self.lstm(inputs, states)          # (batch_size, 1, hidden_size),
+            print(hiddens.shape, hiddens.squeeze(1).shape)
             outputs = self.linear(hiddens.squeeze(1))            # (batch_size, vocab_size)
+            print(outputs.shape)
             predicted = outputs.max(1)[1]
+            print(predicted.shape)
+            print('predicted workd: ', outputs, predicted, manager.decode_tokens([predicted.item()]))
             sampled_ids.append(predicted)
             inputs = self.embed(predicted)
-            inputs = inputs.unsqueeze(1)                         # (batch_size, 1, embed_size)
-        # print 'sampling caption...', type(sampled_ids), 'len=',len(sampled_ids);
-        # print '\n------\n'
-        # print sampled_ids
-        # print '\n------\n'
-        # print sampled_ids[0]
-        # print '\n------\n'
+            inputs = inputs.unsqueeze(1)                         # (batch_size, 1, embed_size))
+            if predicted == manager.wtoi["<end>"]:
+                break
         sampled_ids = torch.cat(sampled_ids, 0)                  # (batch_size, 20)
         return sampled_ids.squeeze()
+
+class EncoderDecoder(nn.Module):
+    def __init__(self, vocab_size,
+                       embed_size = 64, 
+                       hidden_size = 128,  
+                       num_layers = 1):
+        super(EncoderDecoder, self).__init__()
+        self.embed_size = embed_size
+        self.hidden_size = hidden_size
+        self.vocab_size = vocab_size
+        self.num_layers = num_layers
+
+        self.encoder = Encoder(embed_size)
+        self.decoder = Decoder(embed_size, hidden_size, vocab_size, num_layers)
+    
+    def forward(self, images, captions, lengths):
+        image_features = self.encoder(images)
+        out = self.decoder(image_features, captions, lengths)
+        return out
+
+    def sample(self, images, manager):
+        image_features = self.encoder(images)
+        sampled_token_idxs = self.decoder.sample(image_features, manager)
+        return sampled_token_idxs
+
+    def parameters(self):
+        return list(self.encoder.bn.parameters())\
+                    +list(self.encoder.linear.parameters())\
+                    +list(self.decoder.parameters())
