@@ -50,15 +50,13 @@ class Decoder(nn.Module):
     def sample(self, features, manager, states=None):
         sampled_ids = []
         inputs = features.unsqueeze(1)
-        print('image', inputs.shape)
+        # print('image', inputs.shape)
         for i in range(20):                                      # maximum sampling length
             hiddens, states = self.lstm(inputs, states)          # (batch_size, 1, hidden_size),
-            print(hiddens.shape, hiddens.squeeze(1).shape)
             outputs = self.linear(hiddens.squeeze(1))            # (batch_size, vocab_size)
-            print(outputs.shape)
             predicted = outputs.max(1)[1]
-            print(predicted.shape)
-            print('predicted workd: ', outputs, predicted, manager.decode_tokens([predicted.item()]))
+            # print('predicted workd: ', outputs, predicted, manager.decode_tokens([predicted.item()]))
+            # print(predicted.shape, predicted
             sampled_ids.append(predicted)
             inputs = self.embed(predicted)
             inputs = inputs.unsqueeze(1)                         # (batch_size, 1, embed_size))

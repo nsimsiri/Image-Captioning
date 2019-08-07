@@ -49,10 +49,9 @@ def run_model(model, data_loader, criterion, optimizer, train=False, epoch=0, lo
         targets = packed_captions.data
 
         logits = model(images, captions, caption_lengths)
-        # print(logits.shape)
-        # print(targets.shape)
-        # sys.exit()
         loss = criterion(logits, targets)
+        # print('predicted', logits.max(1))
+        # print('targets', targets)
 
         if train:
             loss.backward()
@@ -73,17 +72,23 @@ def evaluate_model(model, data_loader, criterion, manager):
 
     losses = []
     for i, batch in enumerate(data_loader):
-        _, images, captions, caption_lengths = batch
+        annIds, images, captions, caption_lengths = batch
         for j in range(len(images)):
             image = images[j].unsqueeze(0)
             caption = captions[j]
             caption_length = caption_lengths[j]
 
-            # print(image.shape)
             sampled_tokens = model.sample(image, manager)
+            ann_i = manager.load_ann(annIds[j].item())
+            imgId = ann_i['image_id']
+            image_raw = manager.load_image(imgId)
+            plt.imshow(np.array(image_raw))
+            plt.show()
             # print(sampled_tokens)
-            break
-        break
+            
+            tokens = manager.decode_tokens(sampled_tokens)
+            print('predicted: ', tokens)
+            print('gold:', manager.decode_tokens(captions[j].numpy()))
 
 
 
