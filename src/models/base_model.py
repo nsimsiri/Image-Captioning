@@ -65,6 +65,13 @@ class Decoder(nn.Module):
         sampled_ids = torch.cat(sampled_ids, 0)                  # (batch_size, 20)
         return sampled_ids.squeeze()
 
+    # def sample(self, features, manager, sample_size = 15):
+    #     sampled_token_idxs = []
+    #     ctx = features.unsqueeze(1)
+    #     next_token_id = -1
+    #     while i in range(sample_size) and next_token_id != manager.wtoi["<end>"]:
+    #         h_next, c_next = 
+
 class EncoderDecoder(nn.Module):
     def __init__(self, vocab_size,
                        embed_size = 64, 
