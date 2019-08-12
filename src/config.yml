@@ -1,7 +1,9 @@
 config:
+    on_remote: True
     data:
         coco:
             root: /Users/nsimsiri/Documents/code/ml/coco
+            remote_root: /home/nsimsiri/coco
             caption_ann: caption_annotations
             train:
               captions: x

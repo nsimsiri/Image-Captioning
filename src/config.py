@@ -19,18 +19,20 @@ class CaptionConfig():
         self.config_path = config_path
         config_yml = init_configs(config_path)
         coco_yml = config_yml['config']['data']['coco']
+        self.config_yml = config_yml
         self.filters = filters
         self.data_path = defaultdict(dict)
         self._coco = defaultdict(dict)
         self._is_coco_deleted = False
         
         for split in ['val', 'train', 'test']:
+            root = self.get_root()
             for data_type in ['images', 'captions', 'instances']:
                 _path = None
                 if data_type is 'images':
-                    _path = os.path.join(coco_yml['root'], coco_yml[split][data_type])
+                    _path = os.path.join(root, coco_yml[split][data_type])
                 else:    
-                    _path = os.path.join(coco_yml['root'], coco_yml['caption_ann'], coco_yml[split][data_type])    
+                    _path = os.path.join(root, coco_yml['caption_ann'], coco_yml[split][data_type])    
                 try:
                     assert(os.path.exists(_path))
                     self.data_path[split][data_type] = _path
@@ -46,6 +48,13 @@ class CaptionConfig():
     
     def _skip(self, e):
         return e in self.filters
+        
+    def get_root(self):
+        on_remote = self.config_yml['config']['on_remote']
+        coco_yml = self.config_yml['config']['data']['coco']
+        if on_remote:
+            return coco_yml['remote_root']
+        return coco_yml['root']
 
     def get_images_folder_path(self, split='val'):
         if (split not in ['val', 'test', 'train']):

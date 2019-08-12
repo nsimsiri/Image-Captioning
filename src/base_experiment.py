@@ -5,9 +5,8 @@ import matplotlib.pyplot as plt
 
 import numpy as np 
 
-'''
-plot loss 
-'''
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 EVAL_TYPES = ['loss', 'f1', 'precision','recall']
 SPLIT_TYPES = ['train', 'test', 'val']
 SPLIT_TO_COLOR = {
@@ -15,6 +14,7 @@ SPLIT_TO_COLOR = {
     'test': 'g',
     'val': 'b'
 }
+
 
 def plot_eval(data, split_type, name="loss"):
     if split_type not in SPLIT_TYPES:
@@ -33,7 +33,14 @@ def plot_eval(data, split_type, name="loss"):
     plt.show()
 
 import sys
-def run_model(model, data_loader, criterion, optimizer, train=False, epoch=0, log_step=2):
+def run_model(model, 
+              data_loader, 
+              criterion, 
+              optimizer, 
+              train=False, 
+              epoch=0, 
+              log_step=2,
+              device=device):
     if train:
         model.train()
     else:
@@ -44,6 +51,9 @@ def run_model(model, data_loader, criterion, optimizer, train=False, epoch=0, lo
     for i, batch in enumerate(data_loader):
         _ , images, captions, caption_lengths = batch
         optimizer.zero_grad()
+
+        images = images.to(device)
+        captions = captions.to(device)
 
         packed_captions = pack_padded_sequence(captions, caption_lengths, batch_first=True)
         targets = packed_captions.data
@@ -67,12 +77,20 @@ def run_model(model, data_loader, criterion, optimizer, train=False, epoch=0, lo
     return losses, logged_losses
 
 
-def evaluate_model(model, data_loader, criterion, manager):
+def evaluate_model(model, 
+                   data_loader, 
+                   criterion, 
+                   manager, 
+                   device=device):
     model.eval()
 
     losses = []
     for i, batch in enumerate(data_loader):
         annIds, images, captions, caption_lengths = batch
+        images = images.to(device)
+        captions = captions.to(device)
+        caption_lengths = caption_lengths.to(device)
+
         for j in range(len(images)):
             image = images[j].unsqueeze(0)
             caption = captions[j]
@@ -85,10 +103,14 @@ def evaluate_model(model, data_loader, criterion, manager):
             plt.imshow(np.array(image_raw))
             plt.show()
             # print(sampled_tokens)
-            
+            caption_j = captions[j]
+            if device == torch.device('cuda'):
+                sampled_tokens = sampled_tokens.cpu()
+                caption_j = caption[j].cpu()
+            caption_j = caption_j.numpy()
             tokens = manager.decode_tokens(sampled_tokens)
             print('predicted: ', tokens)
-            print('gold:', manager.decode_tokens(captions[j].numpy()))
+            print('gold:', manager.decode_tokens(caption_j)
 
 
 

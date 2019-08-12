@@ -47,36 +47,35 @@ class Decoder(nn.Module):
         outputs = self.linear(hiddens[0])
         return outputs
 
-    def sample(self, features, manager, states=None):
-        sampled_ids = []
-        inputs = features.unsqueeze(1)
-        # print('image', inputs.shape)
-        for i in range(20):                                      # maximum sampling length
-            hiddens, states = self.lstm(inputs, states)          # (batch_size, 1, hidden_size),
-            outputs = self.linear(hiddens.squeeze(1))            # (batch_size, vocab_size)
-            predicted = outputs.max(1)[1]
-            # print('predicted workd: ', outputs, predicted, manager.decode_tokens([predicted.item()]))
-            # print(predicted.shape, predicted
-            sampled_ids.append(predicted)
-            inputs = self.embed(predicted)
-            inputs = inputs.unsqueeze(1)                         # (batch_size, 1, embed_size))
-            if predicted == manager.wtoi["<end>"]:
+    # import sys
+    def sample(self, features, manager, sample_size = 15):
+        sampled_token_idxs = []
+        ctx = features.unsqueeze(1)
+        next_token_id = -1
+        token_ids = []
+        state = None
+        for i in range(sample_size):
+            if next_token_id == manager.wtoi["<end>"]:
                 break
-        sampled_ids = torch.cat(sampled_ids, 0)                  # (batch_size, 20)
-        return sampled_ids.squeeze()
-
-    # def sample(self, features, manager, sample_size = 15):
-    #     sampled_token_idxs = []
-    #     ctx = features.unsqueeze(1)
-    #     next_token_id = -1
-    #     while i in range(sample_size) and next_token_id != manager.wtoi["<end>"]:
-    #         h_next, c_next = 
+            _, (h_next, c_next) = self.lstm(ctx, state) # h_next == output, h_next = (1, 1, hidden_size)
+            score_i = self.linear(h_next.squeeze(0))
+            next_token_id = torch.argmax(score_i, 1)
+            # print('next_token_id', next_token_id.shape)
+            ctx = self.embed(next_token_id)
+            # print(ctx.shape)
+            ctx = ctx.unsqueeze(0)
+            state = (h_next, c_next)
+            # logits = self.linear(outputs.)
+            token_ids.append(next_token_id)
+        token_ids = torch.cat(token_ids, 0)
+        return token_ids
 
 class EncoderDecoder(nn.Module):
     def __init__(self, vocab_size,
                        embed_size = 64, 
                        hidden_size = 128,  
                        num_layers = 1):
+
         super(EncoderDecoder, self).__init__()
         self.embed_size = embed_size
         self.hidden_size = hidden_size
