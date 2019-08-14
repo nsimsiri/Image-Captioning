@@ -1,5 +1,5 @@
 config:
-    on_remote: True
+    on_remote: False
     data:
         coco:
             root: /Users/nsimsiri/Documents/code/ml/coco
