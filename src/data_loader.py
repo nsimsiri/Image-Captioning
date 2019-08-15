@@ -144,15 +144,20 @@ class CaptionDataManager():
             raise Exception("cannot find some encoding for {}".format(tokens))
 
     
-    def decode_tokens(self, encoding, length = 0):
+    def decode_tokens(self, encoding, length = 0, stop_at_end = False):
         tokens = []
         for i, encodingIdx in enumerate(encoding):
             encodingIdx = int(encodingIdx)
+           
             if encodingIdx >= len(self.itow) or encodingIdx < 0:
                 raise ValueError("no such token \'{}\' in vocabulary".format(encodingIdx))
             tokens.append(self.itow[encodingIdx])
+
             if length > 0 and i >= len(encoding):
                 break
+            if stop_at_end and encodingIdx == self.wtoi['<end>']:
+                break
+                
         return " ".join(tokens)
 
     def vocab(self):

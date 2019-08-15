@@ -15,7 +15,6 @@ SPLIT_TO_COLOR = {
     'val': 'b'
 }
 
-
 def plot_eval(data, split_type, name="loss"):
     if split_type not in SPLIT_TYPES:
         raise ValueError("No such split_type `{}`".format(split_type))    
@@ -32,15 +31,8 @@ def plot_eval(data, split_type, name="loss"):
     plt.title("{} for {} set".format(name, split_type))
     plt.show()
 
-import sys
-def run_model(model, 
-              data_loader, 
-              criterion, 
-              optimizer, 
-              train=False, 
-              epoch=0, 
-              log_step=2,
-              device=device):
+def run_model(model, data_loader, criterion, optimizer, train=False, epoch=0, 
+              log_step=2, device=device):
     if train:
         model.train()
     else:
@@ -77,14 +69,10 @@ def run_model(model,
     return losses, logged_losses
 
 
-def evaluate_model(model, 
-                   data_loader, 
-                   criterion, 
-                   manager, 
-                   device=device):
+def evaluate_model(model, data_loader, criterion, manager, device=device):
     model.eval()
-
     losses = []
+
     for i, batch in enumerate(data_loader):
         annIds, images, captions, caption_lengths = batch
         images = images.to(device)
@@ -106,12 +94,37 @@ def evaluate_model(model,
             caption_j = captions[j]
             if device == torch.device('cuda'):
                 sampled_tokens = sampled_tokens.cpu()
-                caption_j = caption[j].cpu()
+                caption_j = caption_j.cpu()
             caption_j = caption_j.numpy()
             tokens = manager.decode_tokens(sampled_tokens)
             print('predicted: ', tokens)
-            print('gold:', manager.decode_tokens(caption_j)
+            print('gold:', manager.decode_tokens(caption_j, stop_at_end=True))
 
+
+def compute_perplexity(model, data_loader, criterion, manager, device=device):
+    """ Computes perplexity given a dataset and model. 
+
+    Perplexity is e^(cross entropy(predicted distribution, true distribution))
+    """
+    token_count = 0
+    model.eval()
+
+    total_ce_loss = 0.0
+    for i, batch in enumerate(data_loader):
+        annIds, images, captions, caption_lengths = batch
+        images = images.to(device)
+        captions = captions.to(device)
+        token_count += torch.sum(caption_lengths).cpu().item()
+
+        logits = model(images, captions, caption_lengths)
+        targets = pack_padded_sequence(captions, caption_lengths, batch_first=True).data
+        ce_loss = criterion(logits, targets)
+        total_ce_loss += ce_loss.cpu().item()
+
+        # print(total_ce_loss, token_count)
+    
+    pplx = np.exp(total_ce_loss/token_count)
+    return pplx
 
 
 if __name__ == '__main__':
