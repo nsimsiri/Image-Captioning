@@ -110,8 +110,30 @@ def evaluate_model(model,
             caption_j = caption_j.numpy()
             tokens = manager.decode_tokens(sampled_tokens)
             print('predicted: ', tokens)
-            print('gold:', manager.decode_tokens(caption_j)
+            print('gold:', manager.decode_tokens(caption_j))
 
+
+def compute_perplexity(model, 
+                       data_loader, 
+                       criterion, 
+                       manager,
+                       device=device):
+    token_count = 0
+    model.eval()
+    total_ce_loss = 0.0
+    for i, batch in enumerate(data_loader):
+        annIds, images, captions, caption_lengths = batch
+        images = images.to(device)
+        captions = captions.to(device)
+        token_counts += torch.sum(caption_lengths)
+    
+        logits = model(images, captions, caption_lengths)
+        targets = pack_padded_sequence(captions, caption_lengths, batch_first=True)
+        ce_loss = criterion(targets, logits)
+        total_ce_loss += ce_loss.cpu().item()
+    
+    pplx = np.exp(total_ce_loss/token_count)
+    return pplx
 
 
 if __name__ == '__main__':
