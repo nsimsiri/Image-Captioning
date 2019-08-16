@@ -101,12 +101,14 @@ def evaluate_model(model, data_loader, criterion, manager, device=device):
             print('gold:', manager.decode_tokens(caption_j, stop_at_end=True))
 
 
-def compute_perplexity(model, data_loader, criterion, manager, device=device):
+def compute_perplexity(model, data_loader, criterion, manager, device=device, per_token=False,
+                       debug=False):
     """ Computes perplexity given a dataset and model. 
 
     Perplexity is e^(cross entropy(predicted distribution, true distribution))
     """
     token_count = 0
+    sentence_count = 0
     model.eval()
 
     total_ce_loss = 0.0
@@ -114,7 +116,9 @@ def compute_perplexity(model, data_loader, criterion, manager, device=device):
         annIds, images, captions, caption_lengths = batch
         images = images.to(device)
         captions = captions.to(device)
+
         token_count += torch.sum(caption_lengths).cpu().item()
+        sentence_count += len(annIds)
 
         logits = model(images, captions, caption_lengths)
         targets = pack_padded_sequence(captions, caption_lengths, batch_first=True).data
@@ -122,9 +126,15 @@ def compute_perplexity(model, data_loader, criterion, manager, device=device):
         total_ce_loss += ce_loss.cpu().item()
 
         # print(total_ce_loss, token_count)
-    print('total_ce_loss', total_ce_loss)
-    print('token_counts', token_count)
-    pplx = np.exp(total_ce_loss/token_count)
+    if debug:
+        print('total_ce_loss', total_ce_loss)
+        print('token_counts', token_count)
+        print('sentence_count', sentence_count)
+
+    pplx = np.exp(total_ce_loss/sentence_count)
+    if per_token:
+        pplx = np.exp(total_ce_loss/token_count)
+    
     return pplx
 
 
