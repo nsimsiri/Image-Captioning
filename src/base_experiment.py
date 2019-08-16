@@ -122,7 +122,8 @@ def compute_perplexity(model, data_loader, criterion, manager, device=device):
         total_ce_loss += ce_loss.cpu().item()
 
         # print(total_ce_loss, token_count)
-    
+    print('total_ce_loss', total_ce_loss)
+    print('token_counts', token_count)
     pplx = np.exp(total_ce_loss/token_count)
     return pplx
 
