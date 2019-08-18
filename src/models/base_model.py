@@ -71,10 +71,8 @@ class Decoder(nn.Module):
         return token_ids
 
 class EncoderDecoder(nn.Module):
-    def __init__(self, vocab_size,
-                       embed_size = 64, 
-                       hidden_size = 128,  
-                       num_layers = 1):
+    def __init__(self, vocab_size, embed_size = 64, hidden_size = 128,  
+                 num_layers = 1):
 
         super(EncoderDecoder, self).__init__()
         self.embed_size = embed_size
